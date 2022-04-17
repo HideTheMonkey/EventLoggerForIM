@@ -1,0 +1,21 @@
+# Global configs
+enableSlack: false
+enableDiscord: false
+avatarUrl: https://crafthead.net/avatar/
+bustUrl: https://crafthead.net/bust/
+
+# Slack configs
+slack:
+  adminIds: []
+  apiToken: xoxb-replace-me
+  channelId: change-me-to-a-channel-id
+  events:
+    logUnsuccessfulLogin: true
+    logBroadcasts: true
+    logServerCommand: true
+    logPlayerAdvancement: true
+    logChat: true
+    logPlayerCommands: true
+    logPlayerDeath: true
+    logPlayerJoinLeave: true
+    logServerStartStop: true
