@@ -51,6 +51,9 @@ slack:
 ## Commands
 - `/elfs [enable|disable <key>] [set token|channel|avatarUrl|bustUrl <value>]` (_note: settings take effect after server restart_)
 
+## Building
+Run `mvn clean compile assembly:single` from the root directory.  This will create `target/ELFIM-<version>-jar-with-dependencies.jar`. Rename this to `ELFIM-<version>.jar` and drop in your plugins folder.
+
 ## Planned Updates
 - Add support for Discord
 - Add ability for players to send messages to admins (From MC to Slack/Discord)
