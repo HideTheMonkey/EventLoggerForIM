@@ -1,5 +1,6 @@
 *.iml
 .classpath
+.DS_Store
 .project
 /.idea/
 /.settings/
