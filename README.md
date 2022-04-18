@@ -1,7 +1,7 @@
 # Event Log For IM (ELFIM)
 
 ELFIM is an event logging plugin for bukkit/spigot Minecraft servers. 
-It forwards server and player events to Slack via an incoming webhook.
+It forwards server and player events to Slack via an incoming webhook.  See [Slack's documentation](https://api.slack.com/messaging/webhooks) for how to set up a webhook.
 
 ### Server Examples
 #### Server Started event
