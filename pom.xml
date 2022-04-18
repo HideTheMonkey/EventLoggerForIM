@@ -8,7 +8,7 @@
   <version>1.1.2</version>
   <packaging>jar</packaging>
 
-  <name>Event Log For IM</name>
+  <name>Event Logger For IM</name>
   <!-- FIXME change it to the project's website -->
   <!-- url>http://www.example.com</url -->
 

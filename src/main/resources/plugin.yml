@@ -1,4 +1,4 @@
-name: EventLogForIM
+name: EventLoggerForIM
 description: Logging utility to send messages to a Slack/Discord webhook.
 version: 1.1.2
 api-version: 1.16

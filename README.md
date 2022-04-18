@@ -1,4 +1,4 @@
-# Event Log For IM (ELFIM)
+# Event Logger For IM (ELFIM)
 
 ELFIM is an event logging plugin for bukkit/spigot Minecraft servers. 
 It forwards server and player events to Slack via an incoming webhook.  See [Slack's documentation](https://api.slack.com/messaging/webhooks) for how to set up a webhook.
@@ -23,7 +23,7 @@ It forwards server and player events to Slack via an incoming webhook.  See [Sla
 ![player command](./resources/PlayerCommand.png)
 
 ## Usage
-After starting the server with the ELFIM.jar in the plugins directory, there will be a new folder `plugins/EventLogForIM` with a `config.yml`.
+After starting the server with the ELFIM.jar in the plugins directory, there will be a new folder `plugins/EventLoggerForIM` with a `config.yml`.
 Update the following settings with your Slack api token and the ID of the channel to post messages to.
 
 For example, replace `xoxb-replace-me` and `change-me-to-a-channel-id` with their respective values.
