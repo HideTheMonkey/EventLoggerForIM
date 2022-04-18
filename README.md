@@ -24,7 +24,7 @@ It forwards server and player events to Slack via an incoming webhook.
 
 ## Usage
 After starting the server with the ELFIM.jar in the plugins directory, there will be a new folder `plugins/EventLogForIM` with a `config.yml`.
-Update the following settings with your Slack api token as well as the ID of the channel to post messages to.
+Update the following settings with your Slack api token and the ID of the channel to post messages to.
 
 For example, replace `xoxb-replace-me` and `change-me-to-a-channel-id` with their respective values.
 ```access transformers
@@ -34,8 +34,22 @@ slack:
 ```
 Once these values are populated restart the server to see the enabled events sent to Slack.  Each event can be toggled on or off via a console command.  See below:
 
+```access transformers
+slack:
+  events:
+    logBroadcasts: true
+    logChat: true
+    logPlayerAdvancement: true
+    logPlayerCommands: true
+    logPlayerDeath: true
+    logPlayerJoinLeave: true
+    logServerCommand: true
+    logServerStartStop: true
+    logUnsuccessfulLogin: true
+```
+
 ## Commands
-- `/elfs [enable|disable <eventName>][set tokenId|channelId|avatarUrl|bustUrl <value>]` (_note: settings take effect after server restart_)
+- `/elfs [enable|disable <key>] [set token|channel|avatarUrl|bustUrl <value>]` (_note: settings take effect after server restart_)
 
 ## Planned Updates
 - Add support for Discord
