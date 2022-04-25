@@ -67,6 +67,15 @@ public class BlockBuilder {
   }
 
   /**
+   *
+   * @param elements
+   * @return
+   */
+  public static ContextBlock getContextBlock(List elements) {
+    return ContextBlock.builder().elements(elements).build();
+  }
+
+  /**
    * @param text
    * @param image
    * @return

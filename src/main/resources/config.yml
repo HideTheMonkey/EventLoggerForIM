@@ -10,12 +10,13 @@ slack:
   apiToken: xoxb-replace-me
   channelId: change-me-to-a-channel-id
   events:
-    logUnsuccessfulLogin: true
     logBroadcasts: true
-    logServerCommand: true
-    logPlayerAdvancement: true
     logChat: true
+    logPlayerAdvancement: true
     logPlayerCommands: true
     logPlayerDeath: true
     logPlayerJoinLeave: true
+    logServerCommand: true
     logServerStartStop: true
+    logStartupPlugins: true
+    logUnsuccessfulLogin: true

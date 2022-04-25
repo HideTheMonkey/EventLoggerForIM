@@ -139,6 +139,14 @@ public class Config {
   }
 
   /**
+   *
+   * @return
+   */
+  public boolean getLogStartupPlugins() {
+    return config.getBoolean("slack.events.logStartupPlugins");
+  }
+
+  /**
    * @return
    */
   public boolean getLogServerCommand() {

@@ -46,6 +46,7 @@ public class EventListener implements Listener {
   private boolean logPlayerJoinLeave = false;
   private boolean logServerCommand = false;
   private boolean logServerStartStop = false;
+  private boolean logStartupPlugins = false;
   private boolean logUnsuccessfulLogin = false;
 
   /**
@@ -64,6 +65,7 @@ public class EventListener implements Listener {
     logPlayerJoinLeave = config.getLogPlayerJoinLeave();
     logServerCommand = config.getLogServerCommand();
     logServerStartStop = config.getLogServerStartStop();
+    logStartupPlugins = config.getLogStartupPlugins();
     logUnsuccessfulLogin = config.getLogUnsuccessfulLogin();
   }
 
@@ -76,8 +78,13 @@ public class EventListener implements Listener {
    */
   @EventHandler
   public void onPluginEnable(PluginEnableEvent event) {
-    if (logServerStartStop && (event.getPlugin().getName().equals(this.pluginName))) {
-      ServerHandler.startup(event.getPlugin().getServer(), config);
+    if ((event.getPlugin().getName().equals(this.pluginName))) {
+      if (logServerStartStop) {
+        ServerHandler.startup(event.getPlugin().getServer(), config);
+      }
+      if (logStartupPlugins) {
+        ServerHandler.listPlugins(event.getPlugin().getServer().getPluginManager(), config);
+      }
     }
   }
 
