@@ -28,6 +28,7 @@ import com.slack.api.model.block.composition.BlockCompositions;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import com.slack.api.model.block.composition.TextObject;
 import com.slack.api.model.block.element.ImageElement;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

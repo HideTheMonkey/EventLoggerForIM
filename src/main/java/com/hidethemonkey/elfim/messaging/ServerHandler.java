@@ -2,16 +2,15 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.Config;
 import com.slack.api.model.block.LayoutBlock;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import org.bukkit.Server;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerHandler extends MessageHandler {
   /**

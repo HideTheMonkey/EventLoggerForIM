@@ -6,7 +6,10 @@ import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -112,7 +115,6 @@ public class PlayerHandler extends MessageHandler {
 
 
   /**
-   * 
    * @param event
    * @param config
    * @param advConfig
