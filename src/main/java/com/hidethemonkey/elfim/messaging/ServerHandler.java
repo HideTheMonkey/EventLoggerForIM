@@ -2,17 +2,15 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.Config;
 import com.slack.api.model.block.LayoutBlock;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import org.bukkit.Server;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerHandler extends MessageHandler {
   /**
@@ -68,9 +66,9 @@ public class ServerHandler extends MessageHandler {
   public static void listPlugins(PluginManager manager, Config config) {
     Plugin[] plugins = manager.getPlugins();
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Installed Plugins");
-    ArrayList<MarkdownTextObject> list = new ArrayList<MarkdownTextObject>();
-    for (int i = 0; i < plugins.length; i++) {
-      list.add(BlockBuilder.getMarkdown("*" + plugins[i].getName() + ":* " + plugins[i].getDescription().getVersion()));
+    ArrayList<MarkdownTextObject> list = new ArrayList<>();
+    for (Plugin plugin : plugins) {
+      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + ":* " + plugin.getDescription().getVersion()));
     }
     blocks.add(BlockBuilder.getContextBlock(list));
     postBlocks(blocks, "List of plugins", config.getChannelId(), config.getToken());

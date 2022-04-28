@@ -186,9 +186,9 @@ public class EventListener implements Listener {
    * @param event
    */
   @EventHandler
-  public void onAsyncPlayerLogin(AsyncPlayerPreLoginEvent event) {
+  public void onPlayerLogin(PlayerLoginEvent event) {
     if (logUnsuccessfulLogin) {
-      if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+      if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
         PlayerHandler.unsuccessfulLogin(event, config);
       }
     }
