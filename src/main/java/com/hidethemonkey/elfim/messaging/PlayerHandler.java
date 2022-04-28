@@ -6,10 +6,7 @@ import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.*;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -21,8 +18,8 @@ public class PlayerHandler extends MessageHandler {
    * @param event
    * @param config
    */
-  public static void unsuccessfulLogin(AsyncPlayerPreLoginEvent event, Config config) {
-    String message = "*" + event.getName() + "* attempted to log in.\n" + event.getKickMessage();
+  public static void unsuccessfulLogin(PlayerLoginEvent event, Config config) {
+    String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n" + event.getKickMessage();
     postMessage(message, config.getChannelId(), config.getToken());
   }
 

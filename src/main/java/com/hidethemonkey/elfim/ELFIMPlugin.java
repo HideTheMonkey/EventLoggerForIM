@@ -26,7 +26,7 @@ package com.hidethemonkey.elfim;
 import com.hidethemonkey.elfim.command.CommandELFS;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Webhook extends JavaPlugin {
+public class ELFIMPlugin extends JavaPlugin {
 
   private String pluginVersion;
 
