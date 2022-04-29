@@ -23,7 +23,9 @@
  */
 package com.hidethemonkey.elfim;
 
-import com.hidethemonkey.elfim.command.CommandELFS;
+import com.hidethemonkey.elfim.commands.CommandELFS;
+import com.hidethemonkey.elfim.listeners.PlayerEventListeners;
+import com.hidethemonkey.elfim.listeners.ServerEventListeners;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ELFIMPlugin extends JavaPlugin {
@@ -45,13 +47,20 @@ public class ELFIMPlugin extends JavaPlugin {
     AdvancementConfig advConfig = new AdvancementConfig(getDataFolder());
 
     if (checkToken(config.getToken()) && checkChannel(config.getChannelId())) {
+      // Register Server Events
       getServer()
           .getPluginManager()
-          .registerEvents(new EventListener(config, advConfig, this.getName()), this);
-      this.getCommand("elfs").setExecutor(new CommandELFS(config));
+          .registerEvents(new ServerEventListeners(config), this);
+
+      // Register Player Events
+      getServer()
+          .getPluginManager()
+          .registerEvents(new PlayerEventListeners(config, advConfig), this);
     } else {
       getLogger().warning("The Slack API token or channel is not configured!");
     }
+    // Register configuration commands
+    this.getCommand("elfs").setExecutor(new CommandELFS(config));
   }
 
   @Override

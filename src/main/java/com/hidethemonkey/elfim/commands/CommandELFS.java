@@ -1,4 +1,4 @@
-package com.hidethemonkey.elfim.command;
+package com.hidethemonkey.elfim.commands;
 
 import com.hidethemonkey.elfim.Config;
 import org.bukkit.ChatColor;
