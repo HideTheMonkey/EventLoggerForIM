@@ -1,6 +1,7 @@
 package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.Config;
+import com.slack.api.model.block.ContextBlockElement;
 import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import org.bukkit.Server;
@@ -66,7 +67,7 @@ public class ServerHandler extends MessageHandler {
   public static void listPlugins(PluginManager manager, Config config) {
     Plugin[] plugins = manager.getPlugins();
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Installed Plugins");
-    ArrayList<MarkdownTextObject> list = new ArrayList<>();
+    ArrayList<ContextBlockElement> list = new ArrayList<>();
     for (Plugin plugin : plugins) {
       list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + ":* " + plugin.getDescription().getVersion()));
     }
@@ -80,7 +81,7 @@ public class ServerHandler extends MessageHandler {
    */
   public static void serverCommand(ServerCommandEvent event, Config config) {
     String message =
-        "*" + event.getSender().getName() + "* issued server command: `" + event.getCommand() + "`";
+        "*" + event.getSender().getName() + "* issued server commands: `" + event.getCommand() + "`";
     postMessage(message, config.getChannelId(), config.getToken());
   }
 

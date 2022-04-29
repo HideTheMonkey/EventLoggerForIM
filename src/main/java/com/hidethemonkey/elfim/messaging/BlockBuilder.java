@@ -72,7 +72,7 @@ public class BlockBuilder {
    * @param elements
    * @return
    */
-  public static ContextBlock getContextBlock(List elements) {
+  public static ContextBlock getContextBlock(List<ContextBlockElement> elements) {
     return ContextBlock.builder().elements(elements).build();
   }
 
