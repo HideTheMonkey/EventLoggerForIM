@@ -36,7 +36,7 @@ public class CommandELFS implements CommandExecutor {
         String value = args.length == 3 ? args[2] : "";
 
         if(!sender.hasPermission("elfsadmin")) {
-            sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to run this commands.");
+            sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to run this command.");
             return false;
         }
 
