@@ -81,7 +81,7 @@ public class ServerHandler extends MessageHandler {
    */
   public static void serverCommand(ServerCommandEvent event, Config config) {
     String message =
-        "*" + event.getSender().getName() + "* issued server commands: `" + event.getCommand() + "`";
+        "*" + event.getSender().getName() + "* issued server command: `" + event.getCommand() + "`";
     postMessage(message, config.getChannelId(), config.getToken());
   }
 

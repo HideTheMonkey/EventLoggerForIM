@@ -109,7 +109,7 @@ public class PlayerHandler extends MessageHandler {
    */
   public static void playerCommand(PlayerCommandPreprocessEvent event, Config config) {
     String message =
-        "*" + event.getPlayer().getName() + "* issued commands: `" + event.getMessage() + "`";
+        "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
     postMessage(message, config.getChannelId(), config.getToken());
   }
 
