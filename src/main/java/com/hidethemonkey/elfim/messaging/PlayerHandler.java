@@ -1,7 +1,30 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2022 HideTheMonkey
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.AdvancementConfig;
-import com.hidethemonkey.elfim.Config;
+import com.hidethemonkey.elfim.ELConfig;
 import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -21,7 +44,7 @@ public class PlayerHandler extends MessageHandler {
    * @param event
    * @param config
    */
-  public static void unsuccessfulLogin(PlayerLoginEvent event, Config config) {
+  public static void unsuccessfulLogin(PlayerLoginEvent event, ELConfig config) {
     String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n" + event.getKickMessage();
     postMessage(message, config.getChannelId(), config.getToken());
   }
@@ -42,7 +65,7 @@ public class PlayerHandler extends MessageHandler {
    * @param player
    * @param config
    */
-  public static void playerJoin(Player player, Config config) {
+  public static void playerJoin(Player player, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Joined");
     blocks.add(
         BlockBuilder.getSectionWithFields(
@@ -66,7 +89,7 @@ public class PlayerHandler extends MessageHandler {
    * @param player
    * @param config
    */
-  public static void playerLeave(Player player, Config config) {
+  public static void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
     String message =
         "*"
@@ -90,7 +113,7 @@ public class PlayerHandler extends MessageHandler {
    * @param event
    * @param config
    */
-  public static void playerChat(AsyncPlayerChatEvent event, Config config) {
+  public static void playerChat(AsyncPlayerChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
     String message = "*" + player.getName() + "* said: " + event.getMessage();
     List<LayoutBlock> blocks = new ArrayList<LayoutBlock>();
@@ -107,7 +130,7 @@ public class PlayerHandler extends MessageHandler {
    * @param event
    * @param config
    */
-  public static void playerCommand(PlayerCommandPreprocessEvent event, Config config) {
+  public static void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
     String message =
         "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
     postMessage(message, config.getChannelId(), config.getToken());
@@ -120,7 +143,7 @@ public class PlayerHandler extends MessageHandler {
    * @param advConfig
    */
   public static void playerAdvancement(
-      PlayerAdvancementDoneEvent event, Config config, AdvancementConfig advConfig) {
+      PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
       String message =
           "*"
@@ -133,7 +156,7 @@ public class PlayerHandler extends MessageHandler {
   }
 
 
-  public static void playerDeath(PlayerDeathEvent event, Config config) {
+  public static void playerDeath(PlayerDeathEvent event, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Died");
     Player player = event.getEntity();
     String deathMessage = event.getDeathMessage();

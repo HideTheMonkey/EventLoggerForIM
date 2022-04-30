@@ -5,7 +5,7 @@
 
   <groupId>com.hidethemonkey.elfim</groupId>
   <artifactId>ELFIM</artifactId>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
   <packaging>jar</packaging>
 
   <name>Event Logger For IM</name>
@@ -62,7 +62,7 @@
             </descriptorRefs>
             <archive>
               <manifest>
-                <mainClass>com.hidethemonkey.elfim.ELFIMPlugin</mainClass>
+                <mainClass>com.hidethemonkey.elfim.ELPlugin</mainClass>
               </manifest>
             </archive>
           </configuration>

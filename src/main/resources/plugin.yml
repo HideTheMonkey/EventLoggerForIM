@@ -1,22 +1,17 @@
 name: EventLoggerForIM
 description: Logging utility to send messages to a Slack/Discord webhook.
-version: 1.1.5
+version: 1.1.6
 api-version: 1.16
 author: HideTheMonkey
-main: com.hidethemonkey.elfim.ELFIMPlugin
+main: com.hidethemonkey.elfim.ELPlugin
+softdepend:
+  - LuckPerms
 commands:
   elfs:
     description: Set Slack related configurations
     usage: /elfs [enable | disable <key>] [set token | channel | avatarUrl | bustUrl <value>]
     permission: ELFIM.elfimadmin
-  elfim:
-    description: Send a message to server admin
-    usage: /elfim <message>
-    permission: ELFIM.elfimuser
 permissions:
-  elfimadmin:
-    description: Allows op to configure ELFIM
-    default: op
-  elfimuser:
-    description: Allows op to send a message to server admin
-    default: op
+  ELFIM.elfimadmin:
+    description: Allows admin to configure ELFIM
+    default: false

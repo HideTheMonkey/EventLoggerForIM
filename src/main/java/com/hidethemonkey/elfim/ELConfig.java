@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Config {
+public class ELConfig {
   private final FileConfiguration config;
   private final Logger logger;
   private String pluginName = "";
@@ -44,7 +44,7 @@ public class Config {
    * @param fileConf
    * @param log
    */
-  public Config(FileConfiguration fileConf, Logger log) {
+  public ELConfig(FileConfiguration fileConf, Logger log) {
     this.config = fileConf;
     this.logger = log;
     config.addDefault("slack.apiToken", defaultSlackToken);
@@ -204,7 +204,7 @@ public class Config {
     if (uuid == null) {
       uuid = "";
     }
-    return config.getString(Config.avatarUrlKey) + uuid;
+    return config.getString(ELConfig.avatarUrlKey) + uuid;
   }
 
   /**
@@ -215,7 +215,7 @@ public class Config {
     if (uuid == null) {
       uuid = "";
     }
-    return config.getString(Config.bustUrlKey) + uuid;
+    return config.getString(ELConfig.bustUrlKey) + uuid;
   }
 
   /**
