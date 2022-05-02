@@ -52,7 +52,7 @@ slack:
 - `/elfs [enable|disable <key>] [set token|channel|avatarUrl|bustUrl <value>]` (_note: settings take effect after server restart_)
 
 ## Building
-Run `mvn clean compile assembly:single` from the root directory.  This will create `target/ELFIM-<version>-jar-with-dependencies.jar`. Rename this to `ELFIM-<version>.jar` and drop in your plugins folder.
+Run `mvn clean package shade:shade` from the root directory.  This will create `target/ELFIM-<version>.jar` that you can drop in your plugins folder.
 
 ## Planned Updates
 - Add support for Discord
