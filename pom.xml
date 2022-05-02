@@ -5,7 +5,7 @@
 
   <groupId>com.hidethemonkey.elfim</groupId>
   <artifactId>ELFIM</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8</version>
   <packaging>jar</packaging>
 
   <name>Event Logger For IM</name>
@@ -43,6 +43,7 @@
   </dependencies>
 
   <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
     <resources>
       <resource>
         <targetPath>.</targetPath>
@@ -59,7 +60,17 @@
           <version>3.3.0</version>
           <configuration>
             <minimizeJar>true</minimizeJar>
-            <generateUniqueDependencyReducedPom>false</generateUniqueDependencyReducedPom>
+            <createDependencyReducedPom>false</createDependencyReducedPom>
+            <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <manifestEntries>
+                    <Main-Class>com.hidethemonkey.elfim.ELPlugin</Main-Class>
+                    <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
+                    <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                  </manifestEntries>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer" />
+            </transformers>
           </configuration>
           <executions>
             <execution>
