@@ -58,7 +58,7 @@ public class CommandELFS implements CommandExecutor {
         String key = args[1];
         String value = args.length == 3 ? args[2] : "";
 
-        if(!sender.hasPermission("elfsadmin")) {
+        if(!sender.hasPermission("ELFIM.elfimadmin")) {
             sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to run this command.");
             return false;
         }
@@ -72,7 +72,11 @@ public class CommandELFS implements CommandExecutor {
             if (configKeys.contains("slack.events." + key)) {
                 config.setBoolean("slack.events." + key, command.equals(enableCMD));
                 sender.sendMessage(ChatColor.GOLD + saveMessage);
-            } else {
+            } else if (key.equals("slack") || key.equals("discord")) {
+                config.setBoolean("enable" + key.substring(0, 1).toUpperCase(Locale.ROOT) + key.substring(1), command.equals(enableCMD));
+                sender.sendMessage(ChatColor.GOLD + saveMessage);
+            }
+            else {
                 sender.sendMessage(ChatColor.DARK_RED + "Unable to set value for [" + key + "]");
                 return false;
             }

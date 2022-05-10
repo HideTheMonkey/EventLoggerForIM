@@ -32,68 +32,59 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
-public class ServerEventListeners implements Listener {
+public class SlackServerListeners {
 
   private final ELConfig config;
 
-  private boolean logBroadcasts = false;
-  private boolean logServerCommand = false;
-  private boolean logServerStartStop = false;
-  private boolean logStartupPlugins = false;
-
   /**
-   * @param config
+   * @param elConfig
    */
-  public ServerEventListeners(ELConfig config) {
-    this.config = config;
-
-    logBroadcasts = config.getLogBroadcasts();
-    logServerCommand = config.getLogServerCommand();
-    logServerStartStop = config.getLogServerStartStop();
-    logStartupPlugins = config.getLogStartupPlugins();
+  public SlackServerListeners(ELConfig elConfig) {
+    config = elConfig;
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPluginEnable(PluginEnableEvent event) {
-    if ((event.getPlugin().getName().equals(this.config.getPluginName()))) {
-      if (logServerStartStop) {
+  public class PluginEnableDisableListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent event) {
+      if ((event.getPlugin().getName().equals(config.getPluginName()))) {
         ServerHandler.startup(event.getPlugin().getServer(), config);
+        if (config.getLogStartupPlugins()) {
+          ServerHandler.listPlugins(event.getPlugin().getServer().getPluginManager(), config);
+        }
       }
-      if (logStartupPlugins) {
-        ServerHandler.listPlugins(event.getPlugin().getServer().getPluginManager(), config);
+    }
+
+
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+      if (event.getPlugin().getName().equals(config.getPluginName())) {
+        ServerHandler.shutdown(event.getPlugin().getServer(), config);
       }
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPluginDisable(PluginDisableEvent event) {
-    if (logServerStartStop && (event.getPlugin().getName().equals(this.config.getPluginName()))) {
-      ServerHandler.shutdown(event.getPlugin().getServer(), config);
-    }
-  }
-
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onBroadcastMessage(BroadcastMessageEvent event) {
-    if (logBroadcasts) {
+  public class BroadcastMessageListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onBroadcastMessage(BroadcastMessageEvent event) {
       ServerHandler.broadcastChat(event, config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onServerCommand(ServerCommandEvent event) {
-    if (logServerCommand) {
+  public class ServerCommandListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onServerCommand(ServerCommandEvent event) {
       ServerHandler.serverCommand(event, config);
     }
   }

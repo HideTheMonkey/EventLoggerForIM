@@ -27,30 +27,35 @@ It forwards server and player events to Slack via an incoming webhook. See [Slac
 _comming soon_
 
 ## Usage
-After starting the server with `ELFIM-<version>.jar` in the plugins folder, you will need to edit `plugins/EventLoggerForIM/config.yml` in the data folder.
-Update the following settings with your Slack api token and the ID of the channel you want the messages sent to.
+After starting the server with `ELFIM-<version>.jar` in the plugins folder, you will need to edit `plugins/EventLoggerForIM/config.yml` to configure the options.
 
+Enable or disable the Slack integration
+```yaml
+enableSlack: true|false
+```
+
+Update the following settings with your Slack api token and the ID of the channel you want the messages sent to.
 For example, replace `xoxb-replace-me` and `change-me-to-a-channel-id` with their respective values.
-```access transformers
+```yaml
 slack:
   apiToken: xoxb-replace-me
   channelId: change-me-to-a-channel-id
 ```
 Once these values are populated restart the server to enable full functionality.  Each event can be toggled on or off via a console command or by editing `config.yml`.
 
-```access transformers
+```yaml
 slack:
   events:
-    logBroadcasts: true
-    logChat: true
-    logPlayerAdvancement: true
-    logPlayerCommands: true
-    logPlayerDeath: true
-    logPlayerJoinLeave: true
-    logServerCommand: true
-    logServerStartStop: true
-    logStartupPlugins: true
-    logUnsuccessfulLogin: true
+    logBroadcasts: true|false
+    logChat: true|false
+    logPlayerAdvancement: true|false
+    logPlayerCommands: true|false
+    logPlayerDeath: true|false
+    logPlayerJoinLeave: true|false
+    logServerCommand: true|false
+    logServerStartStop: true|false
+    logStartupPlugins: true|false
+    logUnsuccessfulLogin: true|false
 ```
 
 ## Commands
@@ -58,6 +63,11 @@ slack:
 
 ### Permissions
 In order to use the `elfs` command you must have the `ELFIM.elfimadmin` permission explicitly set on your user. The easiest way to do that is with another plugin like [LuckPerms](https://luckperms.net/).
+
+### Example commands
+- `elfs enable slack` or `elfs disable slack`
+- `elfs set channel ABC123`
+- `elfs disable logBroadcasts`
 
 ## Building
 Run `mvn clean package shade:shade` from the root directory.  This will create `target/ELFIM-<version>.jar` which you can then drop in your plugins folder.
@@ -68,7 +78,6 @@ Run `mvn clean package shade:shade` from the root directory.  This will create `
 ## Potential Updates
 - Internationalize / Localize text strings
 - Add ability for players to send messages to admins (From MC to Slack/Discord)
-- Improve listener interface (only add a listener if it's configured)
 
 ## License
 ELFIM is licensed under the permissive MIT license. Please see [`LICENSE`](https://github.com/HideTheMonkey/EventLogForIM/blob/main/LICENSE) for more info.

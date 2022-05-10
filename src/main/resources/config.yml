@@ -1,5 +1,5 @@
 # Global configs
-enableSlack: false
+enableSlack: true
 enableDiscord: false
 avatarUrl: https://crafthead.net/avatar/
 bustUrl: https://crafthead.net/bust/

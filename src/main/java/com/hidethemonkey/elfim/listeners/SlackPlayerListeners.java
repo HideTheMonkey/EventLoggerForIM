@@ -31,93 +31,81 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 
-public class PlayerEventListeners implements Listener {
+public class SlackPlayerListeners {
   private final ELConfig config;
   private final AdvancementConfig advConfig;
-  private boolean logChat = false;
-  private boolean logPlayerAdvancement = false;
-  private boolean logPlayerCommands = false;
-  private boolean logPlayerDeath = false;
-  private boolean logPlayerJoinLeave = false;
-  private boolean logUnsuccessfulLogin = false;
 
-  public PlayerEventListeners(ELConfig config, AdvancementConfig advConfig) {
+  public SlackPlayerListeners(ELConfig config, AdvancementConfig advConfig) {
     this.config = config;
     this.advConfig = advConfig;
-    logChat = config.getLogChat();
-    logPlayerAdvancement = config.getLogPlayerAdvancement();
-    logPlayerCommands = config.getLogPlayerCommands();
-    logPlayerDeath = config.getLogPlayerDeath();
-    logPlayerJoinLeave = config.getLogPlayerJoinLeave();
-    logUnsuccessfulLogin = config.getLogUnsuccessfulLogin();
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-    if (logChat) {
+  public class AsyncPlayerChatListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
       PlayerHandler.playerChat(event, config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-    if (logPlayerCommands) {
+  public class PlayerCommandListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
       PlayerHandler.playerCommand(event, config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerDeath(PlayerDeathEvent event) {
-    if (logPlayerDeath) {
+  public class PlayerDeathListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
       PlayerHandler.playerDeath(event, config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerJoin(PlayerJoinEvent event) {
-    if (logPlayerJoinLeave) {
+  public class PlayerJoinListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
       PlayerHandler.playerJoin(event.getPlayer(), config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerQuit(PlayerQuitEvent event) {
-    if (logPlayerJoinLeave) {
+  public class PlayerQuitListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
       PlayerHandler.playerLeave(event.getPlayer(), config);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
-    if (logPlayerAdvancement) {
+  public class PlayerAdvancementListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
       PlayerHandler.playerAdvancement(event, config, advConfig);
     }
   }
 
-  /**
-   * @param event
-   */
-  @EventHandler
-  public void onPlayerLogin(PlayerLoginEvent event) {
-    if (logUnsuccessfulLogin) {
+  public class PlayerLoginListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
       if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
         PlayerHandler.unsuccessfulLogin(event, config);
       }
