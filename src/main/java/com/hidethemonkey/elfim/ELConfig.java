@@ -90,6 +90,14 @@ public class ELConfig {
   }
 
   /**
+   *
+   * @return
+   */
+  public boolean getSlackEnabled() {
+    return config.getBoolean("enableSlack");
+  }
+
+  /**
    * @return
    */
   public boolean getLogBroadcasts() {
