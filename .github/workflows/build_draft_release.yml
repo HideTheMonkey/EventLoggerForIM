@@ -47,7 +47,7 @@ jobs:
           # The name of the tag
           tag_name: ${{ env.VERSION }}
           # The name of the release
-          release_name: "v${{ env.VERSION }}"
+          release_name: "Version ${{ env.VERSION }}"
           # Text describing the contents of the tag
 #           body: # optional
           # Path to file with information about the tag
