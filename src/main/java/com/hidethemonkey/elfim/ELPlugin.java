@@ -40,11 +40,9 @@ public class ELPlugin extends JavaPlugin {
   public void onEnable() {
     saveDefaultConfig();
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
-    // Save the plugin version to use in MessageHandler
-    elConfig.setVersion(this.getDescription().getVersion());
-    saveConfig();
     // Store name on config for easy access later (not saved to file)
     elConfig.setPluginName(this.getName());
+    elConfig.setString("pluginVersion", null); // remove old usage of pluginVersion
 
     saveResource("advancements.yml", true);
     AdvancementConfig advConfig = new AdvancementConfig(getDataFolder());
