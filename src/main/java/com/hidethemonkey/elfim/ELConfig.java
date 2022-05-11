@@ -168,20 +168,6 @@ public class ELConfig {
     return config.getBoolean("slack.events.logServerStartStop");
   }
 
-  /**
-   * @param version
-   */
-  public void setVersion(String version) {
-    config.set("pluginVersion", version);
-  }
-
-  /**
-   * @return
-   */
-  public String getVersion() {
-    return config.getString("pluginVersion");
-  }
-
   public String getPluginName() {
     return pluginName;
   }

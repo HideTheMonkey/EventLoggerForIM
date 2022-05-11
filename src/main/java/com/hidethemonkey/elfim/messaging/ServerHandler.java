@@ -42,6 +42,7 @@ public class ServerHandler extends MessageHandler {
    */
   public static void startup(Server server, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Started");
+    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getDescription().getVersion();
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getMarkdown("*MOTD:* " + server.getMotd()),
@@ -49,7 +50,7 @@ public class ServerHandler extends MessageHandler {
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*MAX PLAYERS:* " + server.getMaxPlayers()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + config.getVersion())));
+            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + pluginVersion)));
 
     String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
     String message = "Minecraft server `" + serverName + "` is now online.";
@@ -62,6 +63,7 @@ public class ServerHandler extends MessageHandler {
    */
   public static void shutdown(Server server, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Stopping");
+    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getDescription().getVersion();
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getMarkdown("*MOTD:* " + server.getMotd()),
@@ -69,7 +71,7 @@ public class ServerHandler extends MessageHandler {
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*ONLINE PLAYERS:* " + server.getOnlinePlayers().size()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + config.getVersion())));
+            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + pluginVersion)));
 
     String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
     String message =
