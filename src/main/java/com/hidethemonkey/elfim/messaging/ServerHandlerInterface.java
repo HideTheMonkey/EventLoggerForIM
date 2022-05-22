@@ -21,43 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.hidethemonkey.elfim;
+package com.hidethemonkey.elfim.messaging;
 
-import java.io.File;
-import org.bukkit.configuration.file.YamlConfiguration;
+import com.hidethemonkey.elfim.ELConfig;
+import org.bukkit.Server;
+import org.bukkit.event.server.BroadcastMessageEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 
-public class AdvancementConfig {
-    private YamlConfiguration config;
+import java.util.logging.Logger;
 
-    public AdvancementConfig(File dataFolder) {
-        File file = new File(dataFolder, "advancements.yml");
-        config = YamlConfiguration.loadConfiguration(file);
-    }
+public interface ServerHandlerInterface {
+  String getServiceName();
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementTitle(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".title");
-    }
+  void startup(Server server, ELConfig config, boolean logPlugins);
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementDescription(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".description");
-    }
+  void shutdown(Server server, ELConfig config);
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancement(String key) {
-        return config.getString(key.replaceAll("/", "."));
-    }
+  void serverCommand(ServerCommandEvent event, ELConfig config, Logger logger);
+
+  void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger);
 }

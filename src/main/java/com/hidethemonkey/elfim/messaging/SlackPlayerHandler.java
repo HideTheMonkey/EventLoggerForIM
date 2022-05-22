@@ -25,8 +25,8 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.LayoutBlock;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -34,43 +34,42 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-public class PlayerHandler extends MessageHandler {
+public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
+
+  /**
+   *
+   * @return
+   */
+  @Override
+  public String getServiceName() {
+    return ELConfig.SLACK;
+  }
 
   /**
    * @param event
    * @param config
    */
-  public static void unsuccessfulLogin(PlayerLoginEvent event, ELConfig config) {
+  @Override
+  public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
     String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n" + event.getKickMessage();
-    postMessage(message, config.getChannelId(), config.getToken());
-  }
-
-  /**
-   * @param location
-   * @return
-   */
-  private static String getLocationString(Location location) {
-    return MessageFormat.format(
-        "{0}, {1}, {2}",
-        String.format("%.0f", location.getX()),
-        String.format("%.0f", location.getY()),
-        String.format("%.0f", location.getZ()));
+    postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
    * @param player
    * @param config
    */
-  public static void playerJoin(Player player, ELConfig config) {
+  @Override
+  public void playerJoin(Player player, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Joined");
     blocks.add(
         BlockBuilder.getSectionWithFields(
             BlockBuilder.getImageElement(
-                config.getBustUrl(player.getUniqueId().toString()), player.getName()),
+                config.getMCUserBustUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown("*NAME:* " + player.getName()),
             BlockBuilder.getMarkdown("*ADDRESS:* " + player.getAddress().getHostName()),
             BlockBuilder.getMarkdown("*OP:* " + player.isOp()),
@@ -79,17 +78,18 @@ public class PlayerHandler extends MessageHandler {
             BlockBuilder.getMarkdown("*EXP:* " + player.getTotalExperience()),
             BlockBuilder.getMarkdown("*LEVEL:* " + player.getLevel()),
             BlockBuilder.getMarkdown("*WORLD:* " + player.getWorld().getName()),
-            BlockBuilder.getMarkdown("*XYZ:* " + getLocationString(player.getLocation()))));
+            BlockBuilder.getMarkdown("*XYZ:* " + StringUtils.getLocationString(player.getLocation()))));
 
     String message = player.getName() + " joined the server.";
-    postBlocks(blocks, message, config.getChannelId(), config.getToken());
+    postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
    * @param player
    * @param config
    */
-  public static void playerLeave(Player player, ELConfig config) {
+  @Override
+  public void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
     String message =
         "*"
@@ -103,46 +103,48 @@ public class PlayerHandler extends MessageHandler {
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(
-                config.getAvatarUrl(player.getUniqueId().toString()), player.getName()),
+                config.getMCUserAvatarUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown(message)));
 
-    postBlocks(blocks, message, config.getChannelId(), config.getToken());
+    postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
    * @param event
    * @param config
    */
-  public static void playerChat(AsyncPlayerChatEvent event, ELConfig config) {
+  @Override
+  public void playerChat(AsyncPlayerChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
     String message = "*" + player.getName() + "* said: " + event.getMessage();
-    List<LayoutBlock> blocks = new ArrayList<LayoutBlock>();
+    List<LayoutBlock> blocks = new ArrayList<>();
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(
-                config.getAvatarUrl(player.getUniqueId().toString()), player.getName()),
+                config.getMCUserAvatarUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown(message)));
 
-    postBlocks(blocks, message, config.getChannelId(), config.getToken());
+    postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
    * @param event
    * @param config
    */
-  public static void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
+  @Override
+  public void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
     String message =
         "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
-    postMessage(message, config.getChannelId(), config.getToken());
+    postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
-
 
   /**
    * @param event
    * @param config
    * @param advConfig
    */
-  public static void playerAdvancement(
+  @Override
+  public void playerAdvancement(
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
       String message =
@@ -151,21 +153,25 @@ public class PlayerHandler extends MessageHandler {
               + "* has made the advancement `"
               + advConfig.getAdvancementTitle(event.getAdvancement().getKey().getKey().toString())
               + "`";
-      postMessage(message, config.getChannelId(), config.getToken());
+      postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
     }
   }
 
-
-  public static void playerDeath(PlayerDeathEvent event, ELConfig config) {
+  /**
+   * @param event
+   * @param config
+   */
+  @Override
+  public void playerDeath(PlayerDeathEvent event, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Died");
     Player player = event.getEntity();
     String deathMessage = event.getDeathMessage();
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(
-                config.getAvatarUrl(player.getUniqueId().toString()), player.getName()),
+                config.getMCUserAvatarUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown(deathMessage)));
 
-    postBlocks(blocks, deathMessage, config.getChannelId(), config.getToken());
+    postBlocks(blocks, deathMessage, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }

@@ -21,43 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.hidethemonkey.elfim;
+package com.hidethemonkey.elfim.messaging;
 
-import java.io.File;
-import org.bukkit.configuration.file.YamlConfiguration;
+import com.hidethemonkey.elfim.AdvancementConfig;
+import com.hidethemonkey.elfim.ELConfig;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
-public class AdvancementConfig {
-    private YamlConfiguration config;
+import java.util.logging.Logger;
 
-    public AdvancementConfig(File dataFolder) {
-        File file = new File(dataFolder, "advancements.yml");
-        config = YamlConfiguration.loadConfiguration(file);
-    }
+public interface PlayerHandlerInterface {
+  String getServiceName();
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementTitle(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".title");
-    }
+  void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger);
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementDescription(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".description");
-    }
+  void playerJoin(Player player, ELConfig config);
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancement(String key) {
-        return config.getString(key.replaceAll("/", "."));
-    }
+  void playerLeave(Player player, ELConfig config);
+
+  void playerChat(AsyncPlayerChatEvent event, ELConfig config);
+
+  void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config);
+
+  void playerAdvancement(
+      PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig);
+
+  void playerDeath(PlayerDeathEvent event, ELConfig config);
 }

@@ -21,43 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.hidethemonkey.elfim;
+package com.hidethemonkey.elfim.helpers;
 
-import java.io.File;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Location;
 
-public class AdvancementConfig {
-    private YamlConfiguration config;
+import java.text.MessageFormat;
 
-    public AdvancementConfig(File dataFolder) {
-        File file = new File(dataFolder, "advancements.yml");
-        config = YamlConfiguration.loadConfiguration(file);
-    }
+public class StringUtils {
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementTitle(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".title");
-    }
+  /**
+   * @param value
+   * @return
+   */
+  public static String removeSpecialChars(String value) {
+    /* Replace color code &color; */
+    value = value.replace("\u00A7" + "2", "");
+    value = value.replace("\u00A7" + "f", "");
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementDescription(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".description");
-    }
+    return value;
+  }
 
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancement(String key) {
-        return config.getString(key.replaceAll("/", "."));
-    }
+  /**
+   * @param location
+   * @return
+   */
+  public static String getLocationString(Location location) {
+    return MessageFormat.format(
+        "{0}, {1}, {2}",
+        String.format("%.0f", location.getX()),
+        String.format("%.0f", location.getY()),
+        String.format("%.0f", location.getZ()));
+  }
 }

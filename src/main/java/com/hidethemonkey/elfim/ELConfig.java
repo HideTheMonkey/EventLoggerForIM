@@ -23,8 +23,13 @@
  */
 package com.hidethemonkey.elfim;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,10 +40,11 @@ public class ELConfig {
   private final Logger logger;
   private String pluginName = "";
 
-  public static final String defaultSlackToken = "xoxb-replace-me";
-  public static final String defaultSlackChannelId = "change-me-to-a-channel-id";
-  public static final String avatarUrlKey = "avatarUrl";
-  public static final String bustUrlKey = "bustUrl";
+  public static final String REPLACEME = "replace-me";
+  public static final String MCUserAvatarUrlKey = "MCUserAvatarUrl";
+  public static final String MCUserBustUrlKey = "MCUserBustUrl";
+  public static final String SLACK = "slack";
+  public static final String DISCORD = "discord";
 
   /**
    * @param fileConf
@@ -47,9 +53,25 @@ public class ELConfig {
   public ELConfig(FileConfiguration fileConf, Logger log) {
     this.config = fileConf;
     this.logger = log;
-    config.addDefault("slack.apiToken", defaultSlackToken);
-    config.addDefault("slack.channelId", defaultSlackChannelId);
+    config.addDefault(SLACK + ".apiToken", REPLACEME);
+    config.addDefault(SLACK + ".channelId", REPLACEME);
     config.options().copyDefaults(true);
+  }
+
+  /**
+   *
+   * @return
+   */
+  public String getGravatarEmail() {
+    return config.getString("gravatarEmail");
+  }
+
+  /**
+   *
+   * @return
+   */
+  public String getGravatarUrl() {
+    return config.getString("gravatarUrl");
   }
 
   /**
@@ -85,12 +107,130 @@ public class ELConfig {
    * @param value
    */
   public void setString(String key, String value) {
-    config.set(key, value);
+    config.set(key, value != null ? value.trim() : null);
     save();
   }
 
   /**
+   * @return
+   */
+  public boolean getLogBroadcasts(String service) {
+    return config.getBoolean(service + ".events.logBroadcasts");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogChat(String service) {
+    return config.getBoolean(service + ".events.logChat");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogPlayerAdvancement(String service) {
+    return config.getBoolean(service + ".events.logPlayerAdvancement");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogPlayerCommands(String service) {
+    return config.getBoolean(service + ".events.logPlayerCommands");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogPlayerDeath(String service) {
+    return config.getBoolean(service + ".events.logPlayerDeath");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogPlayerJoinLeave(String service) {
+    return config.getBoolean(service + ".events.logPlayerJoinLeave");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogUnsuccessfulLogin(String service) {
+    return config.getBoolean(service + ".events.logUnsuccessfulLogin");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogStartupPlugins(String service) {
+    return config.getBoolean(service + ".events.logStartupPlugins");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogServerCommand(String service) {
+    return config.getBoolean(service + ".events.logServerCommand");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogServerStartStop(String service) {
+    return config.getBoolean(service + ".events.logServerStartStop");
+  }
+
+  /**
    *
+   * @return
+   */
+  public String getPluginName() {
+    return pluginName;
+  }
+
+  /**
+   *
+   * @param name
+   */
+  public void setPluginName(String name) {
+    pluginName = name;
+  }
+
+  /**
+   * @param uuid
+   * @return
+   */
+  public String getMCUserAvatarUrl(String uuid) {
+    if (uuid == null) {
+      uuid = "";
+    }
+    return config.getString(ELConfig.MCUserAvatarUrlKey) + uuid;
+  }
+
+  /**
+   * @param uuid
+   * @return
+   */
+  public String getMCUserBustUrl(String uuid) {
+    if (uuid == null) {
+      uuid = "";
+    }
+    return config.getString(ELConfig.MCUserBustUrlKey) + uuid;
+  }
+
+  /**
+   * @param msg
+   */
+  public void log(String msg) {
+    logger.info(msg);
+  }
+
+  ////////////////////////////////////////////////
+  // Slack
+  ////////////////////////////////////////////////
+
+  /**
    * @return
    */
   public boolean getSlackEnabled() {
@@ -100,122 +240,115 @@ public class ELConfig {
   /**
    * @return
    */
-  public boolean getLogBroadcasts() {
-    return config.getBoolean("slack.events.logBroadcasts");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogChat() {
-    return config.getBoolean("slack.events.logChat");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogPlayerAdvancement() {
-    return config.getBoolean("slack.events.logPlayerAdvancement");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogPlayerCommands() {
-    return config.getBoolean("slack.events.logPlayerCommands");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogPlayerDeath() {
-    return config.getBoolean("slack.events.logPlayerDeath");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogPlayerJoinLeave() {
-    return config.getBoolean("slack.events.logPlayerJoinLeave");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogUnsuccessfulLogin() {
-    return config.getBoolean("slack.events.logUnsuccessfulLogin");
-  }
-
-  /**
-   *
-   * @return
-   */
-  public boolean getLogStartupPlugins() {
-    return config.getBoolean("slack.events.logStartupPlugins");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogServerCommand() {
-    return config.getBoolean("slack.events.logServerCommand");
-  }
-
-  /**
-   * @return
-   */
-  public boolean getLogServerStartStop() {
-    return config.getBoolean("slack.events.logServerStartStop");
-  }
-
-  public String getPluginName() {
-    return pluginName;
-  }
-
-  public void setPluginName(String name) {
-    pluginName = name;
-  }
-
-  /**
-   * @return
-   */
-  public String getToken() {
+  public String getSlackAPIToken() {
     return config.getString("slack.apiToken");
   }
 
   /**
    * @return
    */
-  public String getChannelId() {
+  public String getSlackChannelId() {
     return config.getString("slack.channelId");
   }
 
+  ////////////////////////////////////////////////
+  // Discord
+  ////////////////////////////////////////////////
+
   /**
-   * @param uuid
    * @return
    */
-  public String getAvatarUrl(String uuid) {
-    if (uuid == null) {
-      uuid = "";
-    }
-    return config.getString(ELConfig.avatarUrlKey) + uuid;
+  public boolean getDiscordEnabled() {
+    return config.getBoolean("enableDiscord");
   }
 
   /**
-   * @param uuid
+   *
    * @return
    */
-  public String getBustUrl(String uuid) {
-    if (uuid == null) {
-      uuid = "";
-    }
-    return config.getString(ELConfig.bustUrlKey) + uuid;
+  public String getDiscordWebhookUrl() {
+    return config.getString("discord.webhookUrl");
   }
 
   /**
-   * @param msg
+   *
+   * @return
    */
-  public void log(String msg) {
-    logger.info(msg);
+  public String getDiscordBotName() {
+    return config.getString("discord.botUserName");
+  }
+
+  /**
+   *
+   * @return
+   */
+  public String getDiscordAvatarUrl() {
+    return config.getString("discord.botAvatarUrl");
+  }
+
+  /**
+   *
+   * @param name
+   * @return
+   */
+  public int getDiscordColor(String name) {
+    return config.getInt("discord.colors." + name);
+  }
+
+  /**
+   * @param plugin
+   */
+  public static void updateConfig(JavaPlugin plugin) {
+    File file = new File(plugin.getDataFolder(), "config.yml");
+    if (!file.exists()) {
+      // Nothing to update...
+      return;
+    }
+    YamlConfiguration ymlConfig = YamlConfiguration.loadConfiguration(file);
+    String configVersion = ymlConfig.getString("pluginVersion");
+    if (configVersion == null || configVersion.isBlank()) {
+      configVersion = "unknown";
+    }
+    String currentVersion = plugin.getDescription().getVersion();
+    if (!currentVersion.equals(configVersion)) {
+      // backup current config
+      File sourceFile = new File(plugin.getDataFolder(), file.getName());
+      File destFile = new File(plugin.getDataFolder() + "/config." + configVersion + ".yml");
+
+      plugin.getLogger().info(configVersion + " -> new: " + currentVersion);
+      plugin.getLogger().info("Backing up config.yml to " + destFile.getName());
+      if (sourceFile.renameTo(destFile)) {
+        plugin.saveResource(file.getName(), true);
+        try {
+          FileConfiguration fileConfig = plugin.getConfig();
+          fileConfig.load(file);
+          Set<String> keys = ymlConfig.getKeys(true);
+          Object newValue;
+          Object oldValue;
+          plugin.getLogger().info("Restoring previous configuration settings...");
+          for (String key : keys) {
+            oldValue = fileConfig.get(key);
+            newValue = ymlConfig.get(key);
+            if (!key.equals("pluginVersion") &&
+                !(newValue instanceof MemorySection) &&
+                newValue != null &&
+                !newValue.equals(oldValue) &&
+                fileConfig.contains(key)) {
+              plugin.getLogger().info("Updating " + key + " from " + oldValue + " to " + newValue);
+              fileConfig.set(key, newValue);
+            }
+          }
+          fileConfig.save(file);
+          plugin.getLogger().info("Completed updating config.yml to latest version!");
+        } catch (IOException | InvalidConfigurationException e) {
+          plugin.getLogger().log(Level.SEVERE, "Error processing updated config.yml", e);
+          // Something went wrong, so make sure the current config is saved.  This could overwrite
+          // the current settings, but it's safer to have a current config.yml.
+          plugin.saveResource(file.getName(), true);
+        }
+      } else {
+        plugin.getLogger().warning("Failed to backup config.yml");
+      }
+    }
   }
 }
