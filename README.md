@@ -22,11 +22,12 @@ See the [Discord readme](./resources/Discord.md).
 Run `mvn clean package shade:shade` from the root directory.  This will create `target/ELFIM-<version>.jar` which you can then drop in your plugins folder.
 
 ## Planned Updates
-- Add support for Discord
+- ?
 
 ## Potential Updates
 - Internationalize / Localize text strings
 - Add ability for players to send messages to admins (From MC to Slack/Discord)
+- Address Discord's rate limiting issue with webhooks.
 
 ## License
 ELFIM is licensed under the permissive MIT license. Please see [`LICENSE`](https://github.com/HideTheMonkey/EventLogForIM/blob/main/LICENSE) for more info.
