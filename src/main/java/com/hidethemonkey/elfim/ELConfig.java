@@ -315,7 +315,7 @@ public class ELConfig {
       File sourceFile = new File(plugin.getDataFolder(), file.getName());
       File destFile = new File(plugin.getDataFolder() + "/config." + configVersion + ".yml");
 
-      plugin.getLogger().info(configVersion + " -> new: " + currentVersion);
+      plugin.getLogger().info("old: " + configVersion + ", new: " + currentVersion);
       plugin.getLogger().info("Backing up config.yml to " + destFile.getName());
       if (sourceFile.renameTo(destFile)) {
         plugin.saveResource(file.getName(), true);

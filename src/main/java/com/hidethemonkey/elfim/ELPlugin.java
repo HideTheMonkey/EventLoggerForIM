@@ -90,7 +90,7 @@ public class ELPlugin extends JavaPlugin {
    * @param manager
    */
   private void registerServerListeners(String service, ELConfig config, PluginManager manager) {
-    ServerHandlerInterface handler = getServerHandler(service, config);
+    ServerHandlerInterface handler = getServerHandler(service);
     ServerListeners serverListeners = new ServerListeners(config, handler, this);
     if (config.getLogServerStartStop(service)) {
       manager.registerEvents(serverListeners.new PluginEnableDisableListener(), this);
@@ -112,7 +112,7 @@ public class ELPlugin extends JavaPlugin {
    * @param manager
    */
   private void registerPlayerListeners(String service, ELConfig config, AdvancementConfig advConfig, PluginManager manager) {
-    PlayerHandlerInterface handler = getPlayerHandler(service, config);
+    PlayerHandlerInterface handler = getPlayerHandler(service);
     PlayerListeners playerListeners = new PlayerListeners(config, advConfig, handler, this);
     if (config.getLogPlayerJoinLeave(service)) {
       manager.registerEvents(playerListeners.new PlayerJoinListener(), this);
@@ -168,7 +168,7 @@ public class ELPlugin extends JavaPlugin {
    * @param service
    * @return
    */
-  private ServerHandlerInterface getServerHandler(String service, ELConfig config) {
+  private ServerHandlerInterface getServerHandler(String service) {
     if (service.equals(ELConfig.SLACK)) {
       return new SlackServerHandler();
     }
@@ -182,7 +182,7 @@ public class ELPlugin extends JavaPlugin {
    * @param service
    * @return
    */
-  private PlayerHandlerInterface getPlayerHandler(String service, ELConfig config) {
+  private PlayerHandlerInterface getPlayerHandler(String service) {
     if (service.equals(ELConfig.SLACK)) {
       return new SlackPlayerHandler();
     }
