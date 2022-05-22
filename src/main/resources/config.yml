@@ -1,14 +1,54 @@
 # Global configs
-enableSlack: true
+pluginVersion: ${project.version}
+enableSlack: false
 enableDiscord: false
-avatarUrl: https://crafthead.net/avatar/
-bustUrl: https://crafthead.net/bust/
+MCUserAvatarUrl: https://crafthead.net/avatar/
+MCUserBustUrl: https://crafthead.net/bust/
 
 # Slack configs
 slack:
   adminIds: []
-  apiToken: xoxb-replace-me
-  channelId: change-me-to-a-channel-id
+  # See https://api.slack.com/tutorials/tracks/getting-a-token
+  apiToken: replace-me
+  channelId: replace-me
+  events:
+    logBroadcasts: true
+    logChat: true
+    logPlayerAdvancement: true
+    logPlayerCommands: true
+    logPlayerDeath: true
+    logPlayerJoinLeave: true
+    logServerCommand: true
+    logServerStartStop: true
+    logStartupPlugins: true
+    logUnsuccessfulLogin: true
+
+# Discord configs
+# If gravatarEmail is set, gravatarUrl (+ hash of email) will override the value set for discord.avatarUrl
+gravatarEmail: replace-me
+gravatarUrl: https://www.gravatar.com/avatar/
+discord:
+  # See https://discord.com/developers/docs/resources/webhook#execute-webhook
+  # i.e. https://discord.com/api/webhooks/{webhook.id}/{webhook.token}
+  webhookUrl: replace-me
+  # Default name to use for the messages, does not need to be a real user.
+  botUserName: ELFIM
+  botAvatarUrl: replace-me
+  # Colors must be integers, use https://www.spycolor.com/ to get the decimal index of a color.
+  # The default colors are awful, you should change them.
+  colors:
+    playerAdvancement: 9287168
+    playerChat: 8890731
+    playerCommand: 32768
+    playerDeath: 10233154
+    playerFailedLogin: 16712510
+    playerJoin: 2061822
+    playerLeave: 2061822
+    serverBroadcast: 9055202
+    serverCommand: 16733603
+    serverPlugins: 15785090
+    serverShutdown: 16744192
+    serverStartup: 16744192
   events:
     logBroadcasts: true
     logChat: true

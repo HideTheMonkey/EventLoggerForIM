@@ -25,19 +25,30 @@ package com.hidethemonkey.elfim.listeners;
 
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.messaging.PlayerHandler;
+import com.hidethemonkey.elfim.messaging.PlayerHandlerInterface;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.plugin.Plugin;
 
-public class SlackPlayerListeners {
+public class PlayerListeners {
   private final ELConfig config;
   private final AdvancementConfig advConfig;
+  private final PlayerHandlerInterface playerHandler;
+  private final Plugin plugin;
 
-  public SlackPlayerListeners(ELConfig config, AdvancementConfig advConfig) {
+  /**
+   * @param config
+   * @param advConfig
+   * @param playerHandler
+   * @param plugin
+   */
+  public PlayerListeners(ELConfig config, AdvancementConfig advConfig, PlayerHandlerInterface playerHandler, Plugin plugin) {
     this.config = config;
     this.advConfig = advConfig;
+    this.playerHandler = playerHandler;
+    this.plugin = plugin;
   }
 
   public class AsyncPlayerChatListener implements Listener {
@@ -46,7 +57,7 @@ public class SlackPlayerListeners {
      */
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
-      PlayerHandler.playerChat(event, config);
+      playerHandler.playerChat(event, config);
     }
   }
 
@@ -56,7 +67,7 @@ public class SlackPlayerListeners {
      */
     @EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-      PlayerHandler.playerCommand(event, config);
+      playerHandler.playerCommand(event, config);
     }
   }
 
@@ -66,7 +77,7 @@ public class SlackPlayerListeners {
      */
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-      PlayerHandler.playerDeath(event, config);
+      playerHandler.playerDeath(event, config);
     }
   }
 
@@ -76,7 +87,7 @@ public class SlackPlayerListeners {
      */
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-      PlayerHandler.playerJoin(event.getPlayer(), config);
+      playerHandler.playerJoin(event.getPlayer(), config);
     }
   }
 
@@ -86,17 +97,18 @@ public class SlackPlayerListeners {
      */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-      PlayerHandler.playerLeave(event.getPlayer(), config);
+      playerHandler.playerLeave(event.getPlayer(), config);
     }
   }
 
   public class PlayerAdvancementListener implements Listener {
+
     /**
      * @param event
      */
     @EventHandler
     public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
-      PlayerHandler.playerAdvancement(event, config, advConfig);
+      playerHandler.playerAdvancement(event, config, advConfig);
     }
   }
 
@@ -107,7 +119,7 @@ public class SlackPlayerListeners {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
       if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
-        PlayerHandler.unsuccessfulLogin(event, config);
+        playerHandler.playerFailedLogin(event, config, plugin.getLogger());
       }
     }
   }

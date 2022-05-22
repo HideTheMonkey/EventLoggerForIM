@@ -26,21 +26,47 @@ package com.hidethemonkey.elfim.messaging;
 import com.slack.api.Slack;
 import com.slack.api.SlackConfig;
 import com.slack.api.model.block.LayoutBlock;
+import okhttp3.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class MessageHandler {
 
-  private static Slack slack = Slack.getInstance(new SlackConfig());
+  private final Slack slack = Slack.getInstance(new SlackConfig());
+  private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+  private final OkHttpClient client = new OkHttpClient();
 
   /**
-   *
+   * @param url
+   * @param json
+   * @return
+   * @throws IOException
+   */
+  protected String postWebhook(String url, String json, Logger logger) {
+    RequestBody body = RequestBody.create(json, JSON);
+    Request request = new Request.Builder()
+        .url(url)
+        .post(body)
+        .build();
+    String responseBody = "";
+    try (Response response = client.newCall(request).execute()) {
+      responseBody = response.body().string();
+    } catch (IOException ioe) {
+      logger.log(Level.SEVERE, "Error in MessageHandler.postWebhook()", ioe);
+    }
+    return responseBody;
+  }
+
+  /**
    * @param blocks
    * @param message
    * @param channel
    * @param token
    */
-  protected static void postBlocks(
+  protected void postBlocks(
       List<LayoutBlock> blocks, String message, String channel, String token) {
     slack.methodsAsync(token).chatPostMessage(r -> r.channel(channel).blocks(blocks).text(message));
   }
@@ -50,7 +76,7 @@ public abstract class MessageHandler {
    * @param channel
    * @param token
    */
-  protected static void postMessage(String message, String channel, String token) {
+  protected void postMessage(String message, String channel, String token) {
     slack.methodsAsync(token).chatPostMessage(r -> r.channel(channel).text(message));
   }
 }

@@ -24,8 +24,10 @@
 package com.hidethemonkey.elfim;
 
 import com.hidethemonkey.elfim.commands.CommandELFS;
-import com.hidethemonkey.elfim.listeners.SlackPlayerListeners;
-import com.hidethemonkey.elfim.listeners.SlackServerListeners;
+import com.hidethemonkey.elfim.listeners.PlayerListeners;
+import com.hidethemonkey.elfim.listeners.ServerListeners;
+import com.hidethemonkey.elfim.messaging.*;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,33 +35,41 @@ import java.util.Objects;
 
 public class ELPlugin extends JavaPlugin {
 
+  private DiscordMessageFactory messageFactory;
+
   /**
    *
    */
   @Override
   public void onEnable() {
+    ELConfig.updateConfig(this);
     saveDefaultConfig();
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
     // Store name on config for easy access later (not saved to file)
     elConfig.setPluginName(this.getName());
-    elConfig.setString("pluginVersion", null); // remove old usage of pluginVersion
 
     saveResource("advancements.yml", true);
     AdvancementConfig advConfig = new AdvancementConfig(getDataFolder());
 
+    // SLACK
     if (elConfig.getSlackEnabled()) {
-      if (checkToken(elConfig.getToken()) && checkChannel(elConfig.getChannelId())) {
-        // Register Slack Server Events
-        registerSlackServerListeners(elConfig, getServer().getPluginManager());
-
-        // Register Slack Player Events
-        registerSlackPlayerListeners(elConfig, advConfig, getServer().getPluginManager());
+      if (checkSlackToken(elConfig.getSlackAPIToken()) && checkSlackChannel(elConfig.getSlackChannelId())) {
+        registerServerListeners(ELConfig.SLACK, elConfig, getServer().getPluginManager());
+        registerPlayerListeners(ELConfig.SLACK, elConfig, advConfig, getServer().getPluginManager());
       } else {
         getLogger().warning("The Slack API token or channel is not configured!");
       }
-    }
-    else {
+    } else {
       getLogger().info("Slack integration is not enabled.");
+    }
+
+    // DISCORD
+    if (elConfig.getDiscordEnabled()) {
+      this.messageFactory = new DiscordMessageFactory(elConfig, this.getLogger());
+      registerServerListeners(ELConfig.DISCORD, elConfig, getServer().getPluginManager());
+      registerPlayerListeners(ELConfig.DISCORD, elConfig, advConfig, getServer().getPluginManager());
+    } else {
+      getLogger().info("Discord integration is not enabled.");
     }
 
     // Register configuration commands
@@ -75,71 +85,110 @@ public class ELPlugin extends JavaPlugin {
   }
 
   /**
+   * @param service
    * @param config
    * @param manager
    */
-  private void registerSlackServerListeners(ELConfig config, PluginManager manager) {
-    SlackServerListeners serverListeners = new SlackServerListeners(config);
-    if (config.getLogServerStartStop()) {
+  private void registerServerListeners(String service, ELConfig config, PluginManager manager) {
+    ServerHandlerInterface handler = getServerHandler(service);
+    ServerListeners serverListeners = new ServerListeners(config, handler, this);
+    if (config.getLogServerStartStop(service)) {
       manager.registerEvents(serverListeners.new PluginEnableDisableListener(), this);
     }
 
-    if (config.getLogBroadcasts()) {
+    if (config.getLogBroadcasts(service)) {
       manager.registerEvents(serverListeners.new BroadcastMessageListener(), this);
     }
 
-    if (config.getLogServerCommand()) {
+    if (config.getLogServerCommand(service)) {
       manager.registerEvents(serverListeners.new ServerCommandListener(), this);
     }
   }
 
   /**
-   *
+   * @param service
    * @param config
    * @param advConfig
    * @param manager
    */
-  private void registerSlackPlayerListeners(ELConfig config, AdvancementConfig advConfig, PluginManager manager) {
-    SlackPlayerListeners playerListeners = new SlackPlayerListeners(config, advConfig);
-    if (config.getLogPlayerJoinLeave()) {
+  private void registerPlayerListeners(String service, ELConfig config, AdvancementConfig advConfig, PluginManager manager) {
+    PlayerHandlerInterface handler = getPlayerHandler(service);
+    PlayerListeners playerListeners = new PlayerListeners(config, advConfig, handler, this);
+    if (config.getLogPlayerJoinLeave(service)) {
       manager.registerEvents(playerListeners.new PlayerJoinListener(), this);
       manager.registerEvents(playerListeners.new PlayerQuitListener(), this);
     }
 
-    if (config.getLogUnsuccessfulLogin()) {
+    if (config.getLogUnsuccessfulLogin(service)) {
       manager.registerEvents(playerListeners.new PlayerLoginListener(), this);
     }
 
-    if (config.getLogChat()) {
+    if (config.getLogChat(service)) {
       manager.registerEvents(playerListeners.new AsyncPlayerChatListener(), this);
     }
 
-    if (config.getLogPlayerAdvancement()) {
+    if (config.getLogPlayerAdvancement(service)) {
       manager.registerEvents(playerListeners.new PlayerAdvancementListener(), this);
     }
 
-    if (config.getLogPlayerCommands()) {
+    if (config.getLogPlayerCommands(service)) {
       manager.registerEvents(playerListeners.new PlayerCommandListener(), this);
     }
 
-    if (config.getLogPlayerDeath()) {
+    if (config.getLogPlayerDeath(service)) {
       manager.registerEvents(playerListeners.new PlayerDeathListener(), this);
     }
   }
 
-  private boolean checkChannel(String channelId) {
-    if (channelId.trim().isBlank() || channelId.trim().equals(ELConfig.defaultSlackChannelId)) {
-      getLogger().severe("The Slack channel must be set in the plugin config.yml file!");
+  /**
+   * @param channelId
+   * @return
+   */
+  private boolean checkSlackChannel(String channelId) {
+    if (channelId.isBlank() || channelId.equals(ELConfig.REPLACEME)) {
+      getLogger().severe("The Slack channel must be set in /plugin/EventLoggerForIM/config.yml!");
       return false;
     }
     return true;
   }
 
-  private boolean checkToken(String token) {
-    if (token.trim().isBlank() || token.trim().equals(ELConfig.defaultSlackToken)) {
-      getLogger().severe("The Slack API token is not configured, please update it in the plugin config.yml file!");
+  /**
+   * @param token
+   * @return
+   */
+  private boolean checkSlackToken(String token) {
+    if (token.isBlank() || token.equals(ELConfig.REPLACEME)) {
+      getLogger().severe("The Slack API token must be set in /plugin/EventLoggerForIM/config.yml!");
       return false;
     }
     return true;
+  }
+
+  /**
+   * @param service
+   * @return
+   */
+  private ServerHandlerInterface getServerHandler(String service) {
+    if (service.equals(ELConfig.SLACK)) {
+      return new SlackServerHandler();
+    }
+    if (service.equals(ELConfig.DISCORD)) {
+      return new DiscordServerHandler(messageFactory);
+    }
+    return null;
+  }
+
+  /**
+   * @param service
+   * @return
+   */
+  private PlayerHandlerInterface getPlayerHandler(String service) {
+    if (service.equals(ELConfig.SLACK)) {
+      return new SlackPlayerHandler();
+    }
+    if (service.equals(ELConfig.DISCORD)) {
+      return new DiscordPlayerHandler(messageFactory);
+    }
+    return null;
   }
 }

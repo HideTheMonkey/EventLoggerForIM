@@ -21,43 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.hidethemonkey.elfim;
+package com.hidethemonkey.elfim.messaging.json;
 
-import java.io.File;
-import org.bukkit.configuration.file.YamlConfiguration;
+import java.util.ArrayList;
+import java.util.List;
 
-public class AdvancementConfig {
-    private YamlConfiguration config;
+public class DiscordMessage {
+  private String username;
+  private String avatar_url;
+  private String content;
+  private List<Embed> embeds;
 
-    public AdvancementConfig(File dataFolder) {
-        File file = new File(dataFolder, "advancements.yml");
-        config = YamlConfiguration.loadConfiguration(file);
+  public DiscordMessage(String username) {
+    this.username = username;
+  }
+
+  public DiscordMessage(String username, String avatarUrl) {
+    this.username = username;
+    this.avatar_url = avatarUrl;
+  }
+
+  public void setAvatarUrl(String url) {
+    this.avatar_url = url;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public void addEmbed(Embed embed) {
+    if (this.embeds == null) {
+      this.embeds = new ArrayList<>();
     }
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementTitle(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".title");
-    }
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancementDescription(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".description");
-    }
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public String getAdvancement(String key) {
-        return config.getString(key.replaceAll("/", "."));
-    }
+    this.embeds.add(embed);
+  }
 }

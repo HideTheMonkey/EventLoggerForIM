@@ -68,7 +68,6 @@ public class BlockBuilder {
   }
 
   /**
-   *
    * @param elements
    * @return
    */

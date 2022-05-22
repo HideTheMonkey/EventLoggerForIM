@@ -24,23 +24,30 @@
 package com.hidethemonkey.elfim.listeners;
 
 import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.messaging.ServerHandler;
+import com.hidethemonkey.elfim.messaging.ServerHandlerInterface;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.Plugin;
 
-public class SlackServerListeners {
+public class ServerListeners {
 
   private final ELConfig config;
+  private ServerHandlerInterface serverHandler;
+  private final Plugin plugin;
 
   /**
    * @param elConfig
+   * @param handler
+   * @param plugin
    */
-  public SlackServerListeners(ELConfig elConfig) {
+  public ServerListeners(ELConfig elConfig, ServerHandlerInterface handler, Plugin plugin) {
     config = elConfig;
+    this.serverHandler = handler;
+    this.plugin = plugin;
   }
 
   public class PluginEnableDisableListener implements Listener {
@@ -49,22 +56,18 @@ public class SlackServerListeners {
      */
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
-      if ((event.getPlugin().getName().equals(config.getPluginName()))) {
-        ServerHandler.startup(event.getPlugin().getServer(), config);
-        if (config.getLogStartupPlugins()) {
-          ServerHandler.listPlugins(event.getPlugin().getServer().getPluginManager(), config);
-        }
+      if ((event.getPlugin().getName().equals(plugin.getName()))) {
+        serverHandler.startup(event.getPlugin().getServer(), config, config.getLogStartupPlugins(serverHandler.getServiceName()));
       }
     }
-
 
     /**
      * @param event
      */
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-      if (event.getPlugin().getName().equals(config.getPluginName())) {
-        ServerHandler.shutdown(event.getPlugin().getServer(), config);
+      if (event.getPlugin().getName().equals(plugin.getName())) {
+        serverHandler.shutdown(event.getPlugin().getServer(), config);
       }
     }
   }
@@ -75,7 +78,7 @@ public class SlackServerListeners {
      */
     @EventHandler
     public void onBroadcastMessage(BroadcastMessageEvent event) {
-      ServerHandler.broadcastChat(event, config);
+      serverHandler.broadcastChat(event, config, plugin.getLogger());
     }
   }
 
@@ -85,7 +88,7 @@ public class SlackServerListeners {
      */
     @EventHandler
     public void onServerCommand(ServerCommandEvent event) {
-      ServerHandler.serverCommand(event, config);
+      serverHandler.serverCommand(event, config, plugin.getLogger());
     }
   }
 }
