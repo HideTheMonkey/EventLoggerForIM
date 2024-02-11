@@ -24,7 +24,7 @@ slack:
     logUnsuccessfulLogin: true
 
 # Discord configs
-# If gravatarEmail is set, gravatarUrl (+ hash of email) will override the value set for discord.avatarUrl
+# If gravatarEmail is set, gravatarUrl (+ hash of email) will override the value set for discord.botAvatarUrl
 gravatarEmail: replace-me
 gravatarUrl: https://www.gravatar.com/avatar/
 discord:
