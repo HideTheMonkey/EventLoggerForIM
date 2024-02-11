@@ -40,7 +40,7 @@ jobs:
         run: mvn -B package shade:shade --file pom.xml
         
       - name: Release & Assets
-        uses: Hs1r1us/Release-AIO@v2.0
+        uses: Hs1r1us/Release-AIO@v2.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
