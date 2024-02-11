@@ -45,12 +45,12 @@ public class DiscordMessageFactory {
     this.gravatarEmail = config.getGravatarEmail();
     boolean discordEnabled = config.getDiscordEnabled();
 
-    if (this.gravatarEmail.equals(ELConfig.REPLACEME)) {
+    if (this.gravatarEmail.equals(ELConfig.REPLACE_ME)) {
       this.gravatarEmail = null;
     } else {
       useGravatar = true;
     }
-    if (!useGravatar && this.botAvatarUrl.equals(ELConfig.REPLACEME)) {
+    if (!useGravatar && this.botAvatarUrl.equals(ELConfig.REPLACE_ME)) {
       if (discordEnabled) {
         logger.info("botAvatarUrl is not set in config.yml.");
       }

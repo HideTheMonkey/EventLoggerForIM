@@ -28,6 +28,9 @@ import com.hidethemonkey.elfim.listeners.PlayerListeners;
 import com.hidethemonkey.elfim.listeners.ServerListeners;
 import com.hidethemonkey.elfim.messaging.*;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
+
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,6 +39,7 @@ import java.util.Objects;
 public class ELPlugin extends JavaPlugin {
 
   private DiscordMessageFactory messageFactory;
+  private Metrics metrics;
 
   /**
    *
@@ -44,9 +48,14 @@ public class ELPlugin extends JavaPlugin {
   public void onEnable() {
     ELConfig.updateConfig(this);
     saveDefaultConfig();
+
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
+
     // Store name on config for easy access later (not saved to file)
     elConfig.setPluginName(this.getName());
+
+    // Initialize bStats metrics
+    setupMetrics(elConfig);
 
     saveResource("advancements.yml", true);
     AdvancementConfig advConfig = new AdvancementConfig(getDataFolder());
@@ -85,6 +94,31 @@ public class ELPlugin extends JavaPlugin {
   }
 
   /**
+   * 
+   * @param config
+   */
+  private void setupMetrics(ELConfig config) {
+    if (metrics == null) {
+      // Init bStats if it's enabled
+      if (config.getEnableStats()) {
+        // Please don't change the ID. This helps me keep track of generic usage data.
+        // The uploaded stats do not include any private information.
+        this.metrics = new Metrics(this, 20980);
+
+        // Custom charts: track system language
+        this.metrics.addCustomChart(new SimplePie("system_language", () -> {
+          return System.getProperty("user.language") + "_" + System.getProperty("user.country");
+        }));
+
+      } else {
+        getLogger()
+            .info(
+                "bStats is not enabled! Please consider activating this service to help me keep track of ELFIM usage. 🙇");
+      }
+    }
+  }
+
+  /**
    * @param service
    * @param config
    * @param manager
@@ -111,7 +145,8 @@ public class ELPlugin extends JavaPlugin {
    * @param advConfig
    * @param manager
    */
-  private void registerPlayerListeners(String service, ELConfig config, AdvancementConfig advConfig, PluginManager manager) {
+  private void registerPlayerListeners(String service, ELConfig config, AdvancementConfig advConfig,
+      PluginManager manager) {
     PlayerHandlerInterface handler = getPlayerHandler(service);
     PlayerListeners playerListeners = new PlayerListeners(config, advConfig, handler, this);
     if (config.getLogPlayerJoinLeave(service)) {
@@ -145,7 +180,7 @@ public class ELPlugin extends JavaPlugin {
    * @return
    */
   private boolean checkSlackChannel(String channelId) {
-    if (channelId.isBlank() || channelId.equals(ELConfig.REPLACEME)) {
+    if (channelId.isBlank() || channelId.equals(ELConfig.REPLACE_ME)) {
       getLogger().severe("The Slack channel must be set in /plugin/EventLoggerForIM/config.yml!");
       return false;
     }
@@ -157,7 +192,7 @@ public class ELPlugin extends JavaPlugin {
    * @return
    */
   private boolean checkSlackToken(String token) {
-    if (token.isBlank() || token.equals(ELConfig.REPLACEME)) {
+    if (token.isBlank() || token.equals(ELConfig.REPLACE_ME)) {
       getLogger().severe("The Slack API token must be set in /plugin/EventLoggerForIM/config.yml!");
       return false;
     }

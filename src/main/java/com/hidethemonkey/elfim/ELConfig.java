@@ -40,7 +40,8 @@ public class ELConfig {
   private final Logger logger;
   private String pluginName = "";
 
-  public static final String REPLACEME = "replace-me";
+  public static final String REPLACE_ME = "replace-me";
+  public static final String ENABLE_STATS = "enableStats";
   public static final String MCUserAvatarUrlKey = "MCUserAvatarUrl";
   public static final String MCUserBustUrlKey = "MCUserBustUrl";
   public static final String SLACK = "slack";
@@ -53,8 +54,9 @@ public class ELConfig {
   public ELConfig(FileConfiguration fileConf, Logger log) {
     this.config = fileConf;
     this.logger = log;
-    config.addDefault(SLACK + ".apiToken", REPLACEME);
-    config.addDefault(SLACK + ".channelId", REPLACEME);
+    config.addDefault(SLACK + ".apiToken", REPLACE_ME);
+    config.addDefault(SLACK + ".channelId", REPLACE_ME);
+    config.addDefault(ENABLE_STATS, true);
     config.options().copyDefaults(true);
   }
 
@@ -226,6 +228,14 @@ public class ELConfig {
     logger.info(msg);
   }
 
+  /**
+   * 
+   * @return
+   */
+  public boolean getEnableStats() {
+    return config.getBoolean(ENABLE_STATS);
+  }
+
   ////////////////////////////////////////////////
   // Slack
   ////////////////////////////////////////////////
@@ -315,6 +325,7 @@ public class ELConfig {
       File sourceFile = new File(plugin.getDataFolder(), file.getName());
       File destFile = new File(plugin.getDataFolder() + "/config." + configVersion + ".yml");
 
+      plugin.getLogger().info("Found mismatched plugin version, updating config...");
       plugin.getLogger().info("old: " + configVersion + ", new: " + currentVersion);
       plugin.getLogger().info("Backing up config.yml to " + destFile.getName());
       if (sourceFile.renameTo(destFile)) {
@@ -342,7 +353,8 @@ public class ELConfig {
           plugin.getLogger().info("Completed updating config.yml to latest version!");
         } catch (IOException | InvalidConfigurationException e) {
           plugin.getLogger().log(Level.SEVERE, "Error processing updated config.yml", e);
-          // Something went wrong, so make sure the current config is saved.  This could overwrite
+          // Something went wrong, so make sure the current config is saved. This could
+          // overwrite
           // the current settings, but it's safer to have a current config.yml.
           plugin.saveResource(file.getName(), true);
         }
