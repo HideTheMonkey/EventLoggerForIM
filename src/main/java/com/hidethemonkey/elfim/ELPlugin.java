@@ -105,9 +105,22 @@ public class ELPlugin extends JavaPlugin {
         // The uploaded stats do not include any private information.
         this.metrics = new Metrics(this, 20980);
 
-        // Custom charts: track system language
+        // track system language
         this.metrics.addCustomChart(new SimplePie("system_language", () -> {
           return System.getProperty("user.language") + "_" + System.getProperty("user.country");
+        }));
+
+        // track enabled platforms
+        this.metrics.addCustomChart(new SimplePie("enabled_platforms", () -> {
+          final boolean slackEnabled = config.getSlackEnabled();
+          final boolean discordEnabled = config.getDiscordEnabled();
+          if (slackEnabled && discordEnabled)
+            return "Both";
+          else if (slackEnabled)
+            return "Slack";
+          else if (discordEnabled)
+            return "Discord";
+          return "None";
         }));
 
       } else {
