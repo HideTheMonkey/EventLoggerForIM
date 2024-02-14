@@ -28,7 +28,7 @@ See the [Discord readme](./resources/Discord.md).
 
 Run `mvn clean package shade:shade` from the root directory. This will create `target/ELFIM-<version>.jar` which you can then drop in your plugins folder.
 
-_NOTE: version 2.0.1 updates the Java target from 11 to 21. That means if you need to run on an older JVM you'll need to update the `maven.compiler.release` version in pom.xml and rebuild the jar._
+_NOTE: release 2.1.1 updates the Java target to 17. That means if you need to run on an older JVM you'll need to change the `maven.compiler.release` version and `maven.compiler.target` version in pom.xml and rebuild the jar._
 
 ## Planned Updates
 
