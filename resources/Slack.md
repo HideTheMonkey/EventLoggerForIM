@@ -3,7 +3,7 @@
 ## Configuration
 
 Update the following with [your api token](https://api.slack.com/tutorials/tracks/getting-a-token) and the ID of the
-channel where the messages should be sent.
+channel where the messages should be sent. (_this is found at the bottom of the 'View Channel Details' option_)
 That is, replace each `replace-me` with their respective values.
 
 ```yaml
@@ -13,7 +13,7 @@ slack:
   channelId: replace-me
 ```
 
-Once these values are populated restart the server to enable full functionality. Each event can be toggled on or off via
+Once those values are populated restart the server to enable full functionality. Each event can be toggled on or off via
 a console command or by editing `config.yml`.
 
 ```yaml
