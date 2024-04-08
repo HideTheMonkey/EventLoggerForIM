@@ -26,6 +26,7 @@ package com.hidethemonkey.elfim.messaging;
 import com.google.gson.Gson;
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.ELPlugin;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
@@ -37,8 +38,9 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import java.util.logging.Logger;
+import org.bstats.charts.SimplePie;
 
+import java.util.logging.Logger;
 
 public class DiscordPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
 
@@ -89,11 +91,17 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     embed.addField("XYZ", StringUtils.getLocationString(player.getLocation()));
     embed.addField("ONLINE PLAYERS", Integer.toString(player.getServer().getOnlinePlayers().size()));
     embed.addField("WORLD", player.getWorld().getName());
+    embed.addField("GAME MODE", player.getGameMode().toString());
     embed.setImage(config.getMCUserBustUrl(player.getUniqueId().toString()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
+
+    // Track player locale
+    ELPlugin plugin = (ELPlugin) player.getServer().getPluginManager().getPlugin(config.getPluginName());
+    plugin.getMetrics().addCustomChart(
+        new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
   }
 
   /**
@@ -103,8 +111,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   @Override
   public void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
-    String content =
-        "Online count: **" + count + "/" + player.getServer().getMaxPlayers() + "**";
+    String content = "Online count: **" + count + "/" + player.getServer().getMaxPlayers() + "**";
 
     Embed embed = new Embed(config.getDiscordColor("playerLeave"));
     embed.setTitle("Left Server");
@@ -150,7 +157,6 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
   }
-
 
   /**
    * @param event

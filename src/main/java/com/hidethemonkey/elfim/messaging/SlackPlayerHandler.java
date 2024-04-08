@@ -25,6 +25,7 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.ELPlugin;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.entity.Player;
@@ -33,6 +34,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+
+import org.bstats.charts.SimplePie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,10 +81,16 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
             BlockBuilder.getMarkdown("*EXP:* " + player.getTotalExperience()),
             BlockBuilder.getMarkdown("*LEVEL:* " + player.getLevel()),
             BlockBuilder.getMarkdown("*WORLD:* " + player.getWorld().getName()),
-            BlockBuilder.getMarkdown("*XYZ:* " + StringUtils.getLocationString(player.getLocation()))));
+            BlockBuilder.getMarkdown("*XYZ:* " + StringUtils.getLocationString(player.getLocation())),
+            BlockBuilder.getMarkdown("*GAME MODE:* " + player.getGameMode().toString())));
 
     String message = player.getName() + " joined the server.";
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
+
+    // Track player locale
+    ELPlugin plugin = (ELPlugin) player.getServer().getPluginManager().getPlugin(config.getPluginName());
+    plugin.getMetrics().addCustomChart(
+        new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
   }
 
   /**
@@ -91,14 +100,13 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   @Override
   public void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
-    String message =
-        "*"
-            + player.getName()
-            + "* left the server! Online count: *"
-            + count
-            + "/"
-            + player.getServer().getMaxPlayers()
-            + "*";
+    String message = "*"
+        + player.getName()
+        + "* left the server! Online count: *"
+        + count
+        + "/"
+        + player.getServer().getMaxPlayers()
+        + "*";
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Left");
     blocks.add(
         BlockBuilder.getContextBlock(
@@ -133,8 +141,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
-    String message =
-        "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
+    String message = "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -147,12 +154,11 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerAdvancement(
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
-      String message =
-          "*"
-              + event.getPlayer().getName()
-              + "* has made the advancement `"
-              + advConfig.getAdvancementTitle(event.getAdvancement().getKey().getKey().toString())
-              + "`";
+      String message = "*"
+          + event.getPlayer().getName()
+          + "* has made the advancement `"
+          + advConfig.getAdvancementTitle(event.getAdvancement().getKey().getKey().toString())
+          + "`";
       postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
     }
   }

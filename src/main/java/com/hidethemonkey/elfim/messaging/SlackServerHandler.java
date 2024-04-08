@@ -64,7 +64,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*MAX PLAYERS:* " + server.getMaxPlayers()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + pluginVersion)));
+            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
 
     String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
     String message = "Minecraft server `" + serverName + "` is now online.";
@@ -89,15 +89,14 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*ONLINE PLAYERS:* " + server.getOnlinePlayers().size()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*PLUGIN VERSION:* " + pluginVersion)));
+            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
 
     String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
-    String message =
-        "`"
-            + serverName
-            + "` is shutting down! Players still online: *"
-            + server.getOnlinePlayers().size()
-            + "*";
+    String message = "`"
+        + serverName
+        + "` is shutting down! Players still online: *"
+        + server.getOnlinePlayers().size()
+        + "*";
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -123,8 +122,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void serverCommand(ServerCommandEvent event, ELConfig config, Logger logger) {
-    String message =
-        "*" + event.getSender().getName() + "* issued server command: `" + event.getCommand() + "`";
+    String message = "*" + event.getSender().getName() + "* issued server command: `" + event.getCommand() + "`";
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
