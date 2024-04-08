@@ -69,7 +69,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("VERSION", server.getVersion());
     embed.addField("MAX PLAYERS", Integer.toString(server.getMaxPlayers()));
     embed.addField("GAME MODE", server.getDefaultGameMode().toString());
-    embed.addField("PLUGIN VERSION", pluginVersion);
+    embed.addField("ELFIM VERSION", pluginVersion);
     DiscordMessage message = messageFactory.getMessage(embed);
     if (logPlugins) {
       Embed pluginEmbed = new Embed(config.getDiscordColor("serverPlugins"));
@@ -99,7 +99,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("VERSION", server.getVersion());
     embed.addField("ONLINE PLAYERS", Integer.toString(server.getOnlinePlayers().size()));
     embed.addField("GAME MODE", server.getDefaultGameMode().toString());
-    embed.addField("PLUGIN VERSION", pluginVersion);
+    embed.addField("ELFIM VERSION", pluginVersion);
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());

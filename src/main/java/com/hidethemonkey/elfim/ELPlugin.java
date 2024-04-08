@@ -95,6 +95,14 @@ public class ELPlugin extends JavaPlugin {
 
   /**
    * 
+   * @return bstats metrics object
+   */
+  public Metrics getMetrics() {
+    return metrics;
+  }
+
+  /**
+   * 
    * @param config
    */
   private void setupMetrics(ELConfig config) {
