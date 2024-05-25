@@ -25,7 +25,7 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.ELPlugin;
+import com.hidethemonkey.elfim.ELFIM;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.entity.Player;
@@ -88,7 +88,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
 
     // Track player locale
-    ELPlugin plugin = (ELPlugin) player.getServer().getPluginManager().getPlugin(config.getPluginName());
+    ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
         new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
   }
