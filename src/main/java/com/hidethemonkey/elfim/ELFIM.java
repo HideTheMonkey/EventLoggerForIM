@@ -24,10 +24,14 @@
 package com.hidethemonkey.elfim;
 
 import com.hidethemonkey.elfim.commands.CommandELFS;
+import com.hidethemonkey.elfim.helpers.VersionChecker;
+import com.hidethemonkey.elfim.helpers.VersionData;
 import com.hidethemonkey.elfim.listeners.PlayerListeners;
 import com.hidethemonkey.elfim.listeners.ServerListeners;
 import com.hidethemonkey.elfim.messaging.*;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
+
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -36,10 +40,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
-public class ELPlugin extends JavaPlugin {
+public class ELFIM extends JavaPlugin {
 
   private DiscordMessageFactory messageFactory;
   private Metrics metrics;
+  private VersionData versionData;
+
+  /**
+     * 
+     */
+  @Override
+  public void onLoad() {
+    versionData = VersionChecker.getLatestReleaseVersion();
+  }
 
   /**
    *
@@ -53,6 +66,9 @@ public class ELPlugin extends JavaPlugin {
 
     // Store name on config for easy access later (not saved to file)
     elConfig.setPluginName(this.getName());
+
+    // Check for new versions
+    compareVersions();
 
     // Initialize bStats metrics
     setupMetrics(elConfig);
@@ -246,5 +262,29 @@ public class ELPlugin extends JavaPlugin {
       return new DiscordPlayerHandler(messageFactory);
     }
     return null;
+  }
+
+  /**
+  * 
+  */
+  private void compareVersions() {
+    if (versionData == null) {
+      getLogger().warning(
+          "Could not check for new versions. Please see https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM for updates.");
+      return;
+    }
+    DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
+    DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getDescription().getVersion());
+    if (latestVersion.compareTo(currentVersion) > 0) {
+      getLogger().warning("****************************************************************************");
+      getLogger().warning("* A new release of EventLoggerForIM is available!");
+      getLogger().warning("*");
+      getLogger().warning("* New version: " + versionData.getVersion());
+      getLogger().warning("* Your version: " + getDescription().getVersion());
+      getLogger().warning("*");
+      getLogger().warning("* Please update to take advantage of the latest features and bug fixes.");
+      getLogger().warning("* Download here: https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM");
+      getLogger().warning("****************************************************************************");
+    }
   }
 }

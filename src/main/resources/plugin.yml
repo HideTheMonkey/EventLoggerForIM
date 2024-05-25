@@ -3,7 +3,7 @@ description: Logging utility to send messages to a Slack/Discord webhook.
 version: ${project.version}
 api-version: 1.16
 author: HideTheMonkey
-main: com.hidethemonkey.elfim.ELPlugin
+main: com.hidethemonkey.elfim.ELFIM
 softdepend:
   - LuckPerms
 commands:

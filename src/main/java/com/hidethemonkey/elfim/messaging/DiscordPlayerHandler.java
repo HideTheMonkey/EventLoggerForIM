@@ -26,7 +26,7 @@ package com.hidethemonkey.elfim.messaging;
 import com.google.gson.Gson;
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.ELPlugin;
+import com.hidethemonkey.elfim.ELFIM;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
@@ -99,7 +99,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
 
     // Track player locale
-    ELPlugin plugin = (ELPlugin) player.getServer().getPluginManager().getPlugin(config.getPluginName());
+    ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
         new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
   }
