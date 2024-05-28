@@ -131,7 +131,7 @@ public class ELFIM extends JavaPlugin {
 
         // track system language
         this.metrics.addCustomChart(new SimplePie("system_language", () -> {
-          return System.getProperty("user.language") + "_" + System.getProperty("user.country");
+          return System.getProperty("user.language") + "_" + System.getProperty("user.country").toUpperCase();
         }));
 
         // track enabled platforms
@@ -209,6 +209,14 @@ public class ELFIM extends JavaPlugin {
 
     if (config.getLogPlayerDeath(service)) {
       manager.registerEvents(playerListeners.new PlayerDeathListener(), this);
+    }
+
+    if (config.getLogPlayerRespawn(service)) {
+      manager.registerEvents(playerListeners.new PlayerRespawnListener(), this);
+    }
+
+    if (config.getLogPlayerTeleport(service)) {
+      manager.registerEvents(playerListeners.new PlayerTeleportListener(), this);
     }
   }
 

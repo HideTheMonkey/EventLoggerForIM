@@ -158,6 +158,20 @@ public class ELConfig {
   /**
    * @return
    */
+  public boolean getLogPlayerRespawn(String service) {
+    return config.getBoolean(service + ".events.logPlayerRespawn");
+  }
+
+  /**
+   * @return
+   */
+  public boolean getLogPlayerTeleport(String service) {
+    return config.getBoolean(service + ".events.logPlayerTeleport");
+  }
+
+  /**
+   * @return
+   */
   public boolean getLogUnsuccessfulLogin(String service) {
     return config.getBoolean(service + ".events.logUnsuccessfulLogin");
   }

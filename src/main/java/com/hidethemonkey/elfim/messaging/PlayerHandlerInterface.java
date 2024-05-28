@@ -31,6 +31,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.logging.Logger;
 
@@ -51,4 +53,8 @@ public interface PlayerHandlerInterface {
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig);
 
   void playerDeath(PlayerDeathEvent event, ELConfig config);
+
+  void playerRespawn(PlayerRespawnEvent event, ELConfig config);
+
+  void playerTeleport(PlayerTeleportEvent event, ELConfig config);
 }

@@ -44,7 +44,8 @@ public class PlayerListeners {
    * @param playerHandler
    * @param plugin
    */
-  public PlayerListeners(ELConfig config, AdvancementConfig advConfig, PlayerHandlerInterface playerHandler, Plugin plugin) {
+  public PlayerListeners(ELConfig config, AdvancementConfig advConfig, PlayerHandlerInterface playerHandler,
+      Plugin plugin) {
     this.config = config;
     this.advConfig = advConfig;
     this.playerHandler = playerHandler;
@@ -78,6 +79,26 @@ public class PlayerListeners {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
       playerHandler.playerDeath(event, config);
+    }
+  }
+
+  public class PlayerRespawnListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+      playerHandler.playerRespawn(event, config);
+    }
+  }
+
+  public class PlayerTeleportListener implements Listener {
+    /**
+     * @param event
+     */
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+      playerHandler.playerTeleport(event, config);
     }
   }
 
