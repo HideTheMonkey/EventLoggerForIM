@@ -34,7 +34,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bstats.charts.SimplePie;
 
 import java.util.ArrayList;
@@ -90,7 +92,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
+        new SimplePie("player_locale", () -> String.valueOf(StringUtils.formatLocale(player.getLocale()))));
   }
 
   /**
@@ -179,5 +181,39 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
             BlockBuilder.getMarkdown(deathMessage)));
 
     postBlocks(blocks, deathMessage, config.getSlackChannelId(), config.getSlackAPIToken());
+  }
+
+  /**
+   * @param event
+   * @param config
+   */
+  @Override
+  public void playerRespawn(PlayerRespawnEvent event, ELConfig config) {
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Respawned");
+    Player player = event.getPlayer();
+    RespawnReason reason = event.getRespawnReason();
+    blocks.add(
+        BlockBuilder.getContextBlock(
+            BlockBuilder.getImageElement(
+                config.getMCUserAvatarUrl(player.getUniqueId().toString()), player.getName()),
+            BlockBuilder.getMarkdown(player.getName() + " respawned due to " + reason.toString() + ".")));
+
+    postBlocks(blocks, player.getName() + " respawned.", config.getSlackChannelId(), config.getSlackAPIToken());
+  }
+
+  /**
+   * @param event
+   * @param config
+   */
+  @Override
+  public void playerTeleport(PlayerTeleportEvent event, ELConfig config) {
+    // List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player
+    // Teleported");
+    Player player = event.getPlayer();
+
+    String message = "*" + player.getName() + "* teleported from *" + StringUtils.getLocationString(event.getFrom())
+        + "* to *"
+        + StringUtils.getLocationString(event.getTo()) + "*";
+    postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }

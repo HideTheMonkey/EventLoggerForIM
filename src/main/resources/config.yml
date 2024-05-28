@@ -23,6 +23,8 @@ slack:
     logPlayerCommands: true
     logPlayerDeath: true
     logPlayerJoinLeave: true
+    logPlayerRespawn: true
+    logPlayerTeleport: true
     logServerCommand: true
     logServerStartStop: true
     logStartupPlugins: true
@@ -49,6 +51,8 @@ discord:
     playerFailedLogin: 16712510
     playerJoin: 2061822
     playerLeave: 2061822
+    playerRespawn: 2061822
+    playerTeleport: 32768
     serverBroadcast: 9055202
     serverCommand: 16733603
     serverPlugins: 15785090
@@ -61,6 +65,8 @@ discord:
     logPlayerCommands: true
     logPlayerDeath: true
     logPlayerJoinLeave: true
+    logPlayerRespawn: true
+    logPlayerTeleport: true
     logServerCommand: true
     logServerStartStop: true
     logStartupPlugins: true

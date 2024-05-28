@@ -37,7 +37,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bstats.charts.SimplePie;
 
 import java.util.logging.Logger;
@@ -101,7 +103,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> String.valueOf(player.getLocale())));
+        new SimplePie("player_locale", () -> String.valueOf(StringUtils.formatLocale(player.getLocale()))));
   }
 
   /**
@@ -181,6 +183,10 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     }
   }
 
+  /**
+   * @param event
+   * @param config
+   */
   @Override
   public void playerDeath(PlayerDeathEvent event, ELConfig config) {
     Player player = event.getEntity();
@@ -188,6 +194,42 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     embed.setTitle("Died");
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
     embed.setDescription(event.getDeathMessage());
+    DiscordMessage message = messageFactory.getMessage(embed);
+
+    Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
+    postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
+  }
+
+  /**
+   * @param event
+   * @param config
+   */
+  @Override
+  public void playerRespawn(PlayerRespawnEvent event, ELConfig config) {
+    Player player = event.getPlayer();
+    RespawnReason reason = event.getRespawnReason();
+    Embed embed = new Embed(config.getDiscordColor("playerRespawn"));
+    embed.setTitle("Respawned");
+    embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
+    embed.setDescription(player.getName() + " respawned due to " + reason.toString() + ".");
+    DiscordMessage message = messageFactory.getMessage(embed);
+
+    Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
+    postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
+  }
+
+  /**
+   * @param event
+   * @param config
+   */
+  @Override
+  public void playerTeleport(PlayerTeleportEvent event, ELConfig config) {
+    Player player = event.getPlayer();
+    Embed embed = new Embed(config.getDiscordColor("playerTeleport"));
+    embed.setTitle("Teleported");
+    embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
+    embed.setDescription("From: **" + StringUtils.getLocationString(event.getFrom()) + "** To: **"
+        + StringUtils.getLocationString(event.getTo()) + "**");
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
