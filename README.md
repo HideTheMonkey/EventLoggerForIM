@@ -27,6 +27,8 @@ events:
   logPlayerCommands: true|false
   logPlayerDeath: true|false
   logPlayerJoinLeave: true|false
+  logPlayerRespawn: true|false
+  logPlayerTeleport: true|false
   logServerCommand: true|false
   logServerStartStop: true|false
   logStartupPlugins: true|false
