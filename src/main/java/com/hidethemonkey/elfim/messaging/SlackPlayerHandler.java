@@ -92,7 +92,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> String.valueOf(StringUtils.formatLocale(player.getLocale()))));
+        new SimplePie("player_locale", () -> StringUtils.formatLocale(player.getLocale())));
   }
 
   /**
