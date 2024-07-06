@@ -35,6 +35,17 @@ events:
   logUnsuccessfulLogin: true|false
 ```
 
+Log specific server.properties by putting the keys in an array:
+
+```yaml
+# List of server.properties to log on server startup. An empty array will disable the feature.
+logServerProperties:
+  - online-mode
+  - pvp
+  - difficulty
+  - level-type
+```
+
 ## Slack Configuration and Examples
 
 See the [Slack readme](./resources/Slack.md).
