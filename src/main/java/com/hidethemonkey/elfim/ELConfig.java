@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,6 +82,10 @@ public class ELConfig {
    */
   public Set<String> getKeys() {
     return config.getKeys(true);
+  }
+
+  public List<String> getLogProperties() {
+    return config.getStringList("logServerProperties");
   }
 
   /**

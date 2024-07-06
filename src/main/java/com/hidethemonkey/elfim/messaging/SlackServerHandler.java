@@ -33,8 +33,10 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 public class SlackServerHandler extends MessageHandler implements ServerHandlerInterface {
@@ -69,8 +71,18 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
     String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
     String message = "Minecraft server `" + serverName + "` is now online.";
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
+    try {
+      // give it some time to post before listing plugins and properties
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     if (logPlugins) {
       listPlugins(server.getPluginManager(), config);
+    }
+    List<String> logProperties = config.getLogProperties();
+    if (logProperties.size() > 0) {
+      listPproperties(server.getPluginManager(), config, logProperties);
     }
   }
 
@@ -113,6 +125,25 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
     }
     blocks.add(BlockBuilder.getContextBlock(list));
     postBlocks(blocks, "List of plugins", config.getSlackChannelId(), config.getSlackAPIToken());
+  }
+
+  private void listPproperties(PluginManager manager, ELConfig config, List<String> properties) {
+    Properties props = new Properties();
+    ArrayList<ContextBlockElement> list = new ArrayList<>();
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Properties");
+
+    try {
+      props.load(new FileInputStream("server.properties"));
+      for (String key : properties) {
+        list.add(BlockBuilder.getMarkdown("*" + key + ":* " + props.getProperty(key)));
+      }
+    } catch (Exception e) {
+      list.add(BlockBuilder.getMarkdown("Error loading server.properties: " + e.getLocalizedMessage()));
+      e.printStackTrace();
+    }
+
+    blocks.add(BlockBuilder.getContextBlock(list));
+    postBlocks(blocks, "List of properties", config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**

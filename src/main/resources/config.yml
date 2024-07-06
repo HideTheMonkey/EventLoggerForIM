@@ -10,6 +10,13 @@ MCUserBustUrl: https://crafthead.net/bust/
 # and it helps me keep track of overall usage patterns.
 enableStats: true
 
+# List of server.properties to log on server startup. An empty array will disable the feature.
+logServerProperties:
+  - online-mode
+  - pvp
+  - difficulty
+  - level-type
+
 # Slack configs
 slack:
   adminIds: []
@@ -56,6 +63,7 @@ discord:
     serverBroadcast: 9055202
     serverCommand: 16733603
     serverPlugins: 15785090
+    serverProperties: 15785090
     serverShutdown: 16744192
     serverStartup: 16744192
   events:

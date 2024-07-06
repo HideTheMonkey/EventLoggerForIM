@@ -34,6 +34,9 @@ import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.io.FileInputStream;
+import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 public class DiscordServerHandler extends MessageHandler implements ServerHandlerInterface {
@@ -79,6 +82,27 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
         pluginEmbed.addField(installedPlugin.getName(), installedPlugin.getDescription().getVersion());
       }
       message.addEmbed(pluginEmbed);
+    }
+    List<String> logProperties = config.getLogProperties();
+    if (logProperties.size() > 0) {
+      Embed propertiesEmbed = new Embed(config.getDiscordColor("serverProperties"));
+      propertiesEmbed.setTitle("**Server Properties**");
+      Properties props = new Properties();
+      try {
+        props.load(new FileInputStream("server.properties"));
+        for (String key : logProperties) {
+          String value = props.getProperty(key);
+          if (value == null) {
+            value = "";
+          }
+          propertiesEmbed.addField(key, value);
+        }
+      } catch (Exception e) {
+        propertiesEmbed.addField("Error", e.getLocalizedMessage());
+        e.printStackTrace();
+      }
+
+      message.addEmbed(propertiesEmbed);
     }
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());
