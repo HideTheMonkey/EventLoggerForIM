@@ -154,7 +154,7 @@ public class ELFIM extends JavaPlugin {
 
         this.metrics.addCustomChart(new SimplePie("log_gravatar_set", () -> {
           String gravatarEmail = config.getGravatarEmail();
-          return Boolean.toString(gravatarEmail != "replace-me" && gravatarEmail != "");
+          return Boolean.toString(!gravatarEmail.equals(ELConfig.REPLACE_ME) && !gravatarEmail.isEmpty());
         }));
 
         this.metrics.addCustomChart(new SimplePie("log_server_start_stop", () -> {

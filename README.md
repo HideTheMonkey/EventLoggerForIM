@@ -38,7 +38,9 @@ events:
 Log specific server.properties by putting the keys in an array:
 
 ```yaml
-# List of server.properties to log on server startup. An empty array will disable the feature.
+# List of server.properties to log on server startup.
+# NOTE: you must use square brackets [] for an empty array to disable this feature.
+#       e.g. logServerProperties: []
 logServerProperties:
   - online-mode
   - pvp
