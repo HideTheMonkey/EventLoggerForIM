@@ -10,7 +10,9 @@ MCUserBustUrl: https://crafthead.net/bust/
 # and it helps me keep track of overall usage patterns.
 enableStats: true
 
-# List of server.properties to log on server startup. An empty array will disable the feature.
+# List of server.properties to log on server startup.
+# NOTE: you must use square brackets [] for an empty array to disable this feature.
+#       e.g. logServerProperties: []
 logServerProperties:
   - online-mode
   - pvp
