@@ -6,7 +6,7 @@
 
   <groupId>com.hidethemonkey.elfim</groupId>
   <artifactId>ELFIM</artifactId>
-  <version>2.2.1</version>
+  <version>2.2.2</version>
   <packaging>jar</packaging>
 
   <name>Event Logger For IM</name>
@@ -33,14 +33,14 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.20.6-R0.1-SNAPSHOT</version>
+      <version>1.21-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.slack.api/slack-api-client -->
     <dependency>
       <groupId>com.slack.api</groupId>
       <artifactId>slack-api-client</artifactId>
-      <version>1.39.3</version>
+      <version>1.40.3</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
     <dependency>
