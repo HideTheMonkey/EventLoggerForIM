@@ -2,9 +2,12 @@
 
 ![logo](./resources/logo_small.png)
 
-ELFIM (_pronounced "elf eye em"_) is a light-weight event logging plugin that posts selected events to Slack and Discord. It's a convienient way to keep track of who logged on when, or what commands they used while playing.
+ELFIM (_pronounced "elf eye em"_) is a light-weight event logging plugin that posts selected events to Slack and Discord. It's a convenient way to keep track of who logged on when, or what commands they used while playing.
 
-Available on [PaperMC](https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM)! (_Only tested on Paper, but should work fine on Spigot and Bukkit servers too._)
+#### Available at
+- [PaperMC](https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM)!
+- [SpigotMC](https://www.spigotmc.org/resources/eventloggerforim.118800/)!
+- [Modrinth](https://modrinth.com/plugin/eventloggerforim)!
 
 ## Usage
 
