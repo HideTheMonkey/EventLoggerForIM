@@ -27,12 +27,12 @@ import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 
 import java.util.logging.Logger;
 
@@ -45,7 +45,7 @@ public interface PlayerHandlerInterface {
 
   void playerLeave(Player player, ELConfig config);
 
-  void playerChat(AsyncPlayerChatEvent event, ELConfig config);
+  void playerChat(AsyncChatEvent event, ELConfig config);
 
   void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config);
 

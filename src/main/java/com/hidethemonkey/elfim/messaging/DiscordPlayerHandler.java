@@ -33,7 +33,6 @@ import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
 import com.hidethemonkey.elfim.messaging.json.Embed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -41,6 +40,9 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bstats.charts.SimplePie;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.logging.Logger;
 
@@ -70,7 +72,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     Embed embed = new Embed(config.getDiscordColor("playerFailedLogin"));
     embed.setTitle("Tried to Log in");
     embed.addAuthor(event.getPlayer().getName(), config.getMCUserAvatarUrl(event.getPlayer().getUniqueId().toString()));
-    embed.setDescription(event.getKickMessage());
+    embed.setDescription(((TextComponent) event.kickMessage()).content());
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
@@ -103,7 +105,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> String.valueOf(StringUtils.formatLocale(player.getLocale()))));
+        new SimplePie("player_locale", () -> String.valueOf(player.locale())));
   }
 
   /**
@@ -130,12 +132,12 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
    * @param config
    */
   @Override
-  public void playerChat(AsyncPlayerChatEvent event, ELConfig config) {
+  public void playerChat(AsyncChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
     Embed embed = new Embed(config.getDiscordColor("playerChat"));
     embed.setTitle("Said in Chat");
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription(event.getMessage());
+    embed.setDescription(((TextComponent) event.message()).content());
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
@@ -193,7 +195,8 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     Embed embed = new Embed(config.getDiscordColor("playerDeath"));
     embed.setTitle("Died");
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription(event.getDeathMessage());
+    String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
+    embed.setDescription(deathMessage);
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();

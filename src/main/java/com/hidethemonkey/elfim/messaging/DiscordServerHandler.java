@@ -34,6 +34,8 @@ import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 
+import net.kyori.adventure.text.TextComponent;
+
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.Properties;
@@ -64,10 +66,10 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   @Override
   public void startup(Server server, ELConfig config, boolean logPlugins) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
-    String pluginVersion = plugin.getDescription().getVersion();
+    String pluginVersion = plugin.getPluginMeta().getVersion();
     Embed embed = new Embed(config.getDiscordColor("serverStartup"));
     embed.setTitle("**Server Started**");
-    embed.addField("MOTD", server.getMotd());
+    embed.addField("MOTD", ((TextComponent) server.motd()).content());
     embed.addField("TYPE", server.getName());
     embed.addField("VERSION", server.getVersion());
     embed.addField("MAX PLAYERS", Integer.toString(server.getMaxPlayers()));
@@ -79,7 +81,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
       pluginEmbed.setTitle("**Installed Plugins**");
       Plugin[] plugins = server.getPluginManager().getPlugins();
       for (Plugin installedPlugin : plugins) {
-        pluginEmbed.addField(installedPlugin.getName(), installedPlugin.getDescription().getVersion());
+        pluginEmbed.addField(installedPlugin.getName(), installedPlugin.getPluginMeta().getVersion());
       }
       message.addEmbed(pluginEmbed);
     }
@@ -115,10 +117,10 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   @Override
   public void shutdown(Server server, ELConfig config) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
-    String pluginVersion = plugin.getDescription().getVersion();
+    String pluginVersion = plugin.getPluginMeta().getVersion();
     Embed embed = new Embed(config.getDiscordColor("serverShutdown"));
     embed.setTitle("**Server Stopping**");
-    embed.addField("MOTD", server.getMotd());
+    embed.addField("MOTD", ((TextComponent) server.motd()).content());
     embed.addField("TYPE", server.getName());
     embed.addField("VERSION", server.getVersion());
     embed.addField("ONLINE PLAYERS", Integer.toString(server.getOnlinePlayers().size()));
@@ -153,7 +155,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   public void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger) {
     Embed embed = new Embed(config.getDiscordColor("serverBroadcast"));
     embed.setTitle("Broadcast Message");
-    embed.setDescription(StringUtils.removeSpecialChars(event.getMessage()));
+    embed.setDescription(StringUtils.removeSpecialChars(((TextComponent) event.message()).content()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);

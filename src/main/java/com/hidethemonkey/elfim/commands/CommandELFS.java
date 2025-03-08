@@ -24,10 +24,12 @@
 package com.hidethemonkey.elfim.commands;
 
 import com.hidethemonkey.elfim.ELConfig;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.Locale;
 import java.util.Set;
@@ -35,7 +37,7 @@ import java.util.Set;
 public class CommandELFS implements CommandExecutor {
 
   private ELConfig config;
-  private Set configKeys;
+  private Set<String> configKeys;
   final private String enableCMD = "enable";
   final private String disableCMD = "disable";
   final private String setCMD = "set";
@@ -59,40 +61,43 @@ public class CommandELFS implements CommandExecutor {
     String value = args.length == 3 ? args[2] : "";
 
     if (!sender.hasPermission("ELFIM.elfimadmin")) {
-      sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to run this command.");
+      sender.sendMessage(Component.text("You do not have permission to run this command.", NamedTextColor.DARK_RED));
       return false;
     }
 
     if (command.isBlank() || !(command.equals(enableCMD) || command.equals(disableCMD) || command.equals(setCMD))) {
-      sender.sendMessage(ChatColor.DARK_RED + "Command [" + command + "] must be either enable, disable, or set");
+      sender.sendMessage(
+          Component.text("Command [" + command + "] must be either enable, disable, or set", NamedTextColor.DARK_RED));
       return false;
     }
 
     if (command.equals(enableCMD) || command.equals(disableCMD)) {
       if (configKeys.contains("slack.events." + key)) {
         config.setBoolean("slack.events." + key, command.equals(enableCMD));
-        sender.sendMessage(ChatColor.GOLD + saveMessage);
+        sender.sendMessage(Component.text(saveMessage, NamedTextColor.GOLD));
       } else if (key.equals("slack") || key.equals("discord")) {
-        config.setBoolean("enable" + key.substring(0, 1).toUpperCase(Locale.ROOT) + key.substring(1), command.equals(enableCMD));
-        sender.sendMessage(ChatColor.GOLD + saveMessage);
+        config.setBoolean("enable" + key.substring(0, 1).toUpperCase(Locale.ROOT) + key.substring(1),
+            command.equals(enableCMD));
+        sender.sendMessage(Component.text(saveMessage, NamedTextColor.GOLD));
       } else {
-        sender.sendMessage(ChatColor.DARK_RED + "Unable to set value for [" + key + "]");
+        sender.sendMessage(Component.text("Unable to set value for [" + key + "]", NamedTextColor.DARK_RED));
         return false;
       }
     }
 
     if (command.equals(setCMD)) {
       boolean validSlackSubCommands = key.equalsIgnoreCase(tokenSubCMD) || key.equalsIgnoreCase(channelSubCMD);
-      boolean validURLSubCommands = key.equalsIgnoreCase(ELConfig.MCUserAvatarUrlKey) || key.equalsIgnoreCase(ELConfig.MCUserBustUrlKey);
+      boolean validURLSubCommands = key.equalsIgnoreCase(ELConfig.MCUserAvatarUrlKey)
+          || key.equalsIgnoreCase(ELConfig.MCUserBustUrlKey);
       if (validSlackSubCommands) {
         String slackKey = key.equalsIgnoreCase(tokenSubCMD) ? "slack.apiToken" : "slack.channelId";
         config.setString(slackKey, value);
-        sender.sendMessage(ChatColor.GOLD + saveMessage);
+        sender.sendMessage(Component.text(saveMessage, NamedTextColor.GOLD));
       } else if (validURLSubCommands) {
         config.setString(key, value);
-        sender.sendMessage(ChatColor.GOLD + saveMessage);
+        sender.sendMessage(Component.text(saveMessage, NamedTextColor.GOLD));
       } else {
-        sender.sendMessage(ChatColor.DARK_RED + "Sub Command [" + key + "] is not a valid option.");
+        sender.sendMessage(Component.text("Sub Command [" + key + "] is not a valid option.", NamedTextColor.DARK_RED));
         return false;
       }
     }

@@ -30,7 +30,6 @@ import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.LayoutBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -38,6 +37,9 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bstats.charts.SimplePie;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +62,8 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
-    String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n" + event.getKickMessage();
+    String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n"
+        + ((TextComponent) event.kickMessage()).content();
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -92,7 +95,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
     plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> StringUtils.formatLocale(player.getLocale())));
+        new SimplePie("player_locale", () -> player.locale().toString()));
   }
 
   /**
@@ -124,9 +127,9 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    * @param config
    */
   @Override
-  public void playerChat(AsyncPlayerChatEvent event, ELConfig config) {
+  public void playerChat(AsyncChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
-    String message = "*" + player.getName() + "* said: " + event.getMessage();
+    String message = "*" + player.getName() + "* said: " + ((TextComponent) event.message()).content();
     List<LayoutBlock> blocks = new ArrayList<>();
     blocks.add(
         BlockBuilder.getContextBlock(
@@ -173,7 +176,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerDeath(PlayerDeathEvent event, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Died");
     Player player = event.getEntity();
-    String deathMessage = event.getDeathMessage();
+    String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(

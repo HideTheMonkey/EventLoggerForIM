@@ -33,6 +33,8 @@ import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
+import net.kyori.adventure.text.TextComponent;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,17 +60,18 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
   @Override
   public void startup(Server server, ELConfig config, boolean logPlugins) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Started");
-    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getDescription().getVersion();
+    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
     blocks.add(
         BlockBuilder.getContextBlock(
-            BlockBuilder.getMarkdown("*MOTD:* " + server.getMotd()),
+            BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
             BlockBuilder.getMarkdown("*TYPE:* " + server.getName()),
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*MAX PLAYERS:* " + server.getMaxPlayers()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
             BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
 
-    String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
+    String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
+        : ((TextComponent) server.motd()).content();
     String message = "Minecraft server `" + serverName + "` is now online.";
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
     try {
@@ -93,17 +96,18 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
   @Override
   public void shutdown(Server server, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Stopping");
-    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getDescription().getVersion();
+    String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
     blocks.add(
         BlockBuilder.getContextBlock(
-            BlockBuilder.getMarkdown("*MOTD:* " + server.getMotd()),
+            BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
             BlockBuilder.getMarkdown("*TYPE:* " + server.getName()),
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*ONLINE PLAYERS:* " + server.getOnlinePlayers().size()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
             BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
 
-    String serverName = server.getMotd().isBlank() ? server.getName() : server.getMotd();
+    String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
+        : ((TextComponent) server.motd()).content();
     String message = "`"
         + serverName
         + "` is shutting down! Players still online: *"
@@ -121,7 +125,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Installed Plugins");
     ArrayList<ContextBlockElement> list = new ArrayList<>();
     for (Plugin plugin : plugins) {
-      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + ":* " + plugin.getDescription().getVersion()));
+      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + ":* " + plugin.getPluginMeta().getVersion()));
     }
     blocks.add(BlockBuilder.getContextBlock(list));
     postBlocks(blocks, "List of plugins", config.getSlackChannelId(), config.getSlackAPIToken());
@@ -164,7 +168,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger) {
-    String message = "*[BROADCAST]* " + StringUtils.removeSpecialChars(event.getMessage());
+    String message = "*[BROADCAST]* " + StringUtils.removeSpecialChars(((TextComponent) event.message()).content());
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }
