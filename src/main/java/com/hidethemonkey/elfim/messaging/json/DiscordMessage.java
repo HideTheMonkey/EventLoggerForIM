@@ -26,6 +26,7 @@ package com.hidethemonkey.elfim.messaging.json;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class DiscordMessage {
   private String username;
   private String avatar_url;

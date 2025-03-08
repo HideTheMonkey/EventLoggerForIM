@@ -28,6 +28,7 @@ import com.hidethemonkey.elfim.helpers.MD5Util;
 
 import java.util.logging.Logger;
 
+@SuppressWarnings("unused")
 public class DiscordMessageFactory {
   private ELConfig config;
   private Logger logger;

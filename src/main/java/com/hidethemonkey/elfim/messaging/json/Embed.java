@@ -26,6 +26,7 @@ package com.hidethemonkey.elfim.messaging.json;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class Embed {
 
   private int color;

@@ -47,8 +47,8 @@ public class ELFIM extends JavaPlugin {
   private VersionData versionData;
 
   /**
-     * 
-     */
+   * 
+   */
   @Override
   public void onLoad() {
     versionData = VersionChecker.getLatestReleaseVersion();
@@ -347,13 +347,13 @@ public class ELFIM extends JavaPlugin {
       return;
     }
     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
-    DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getDescription().getVersion());
+    DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getPluginMeta().getVersion());
     if (latestVersion.compareTo(currentVersion) > 0) {
       getLogger().warning("****************************************************************************");
       getLogger().warning("* A new release of EventLoggerForIM is available!");
       getLogger().warning("*");
       getLogger().warning("* New version: " + versionData.getVersion());
-      getLogger().warning("* Your version: " + getDescription().getVersion());
+      getLogger().warning("* Your version: " + getPluginMeta().getVersion());
       getLogger().warning("*");
       getLogger().warning("* Please update to take advantage of the latest features and bug fixes.");
       getLogger().warning("* Download here: https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM");

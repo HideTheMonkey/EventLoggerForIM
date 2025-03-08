@@ -31,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
+import io.papermc.paper.event.player.AsyncChatEvent;
 
 public class PlayerListeners {
   private final ELConfig config;
@@ -57,7 +58,7 @@ public class PlayerListeners {
      * @param event
      */
     @EventHandler
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+    public void onAsyncPlayerChat(AsyncChatEvent event) {
       playerHandler.playerChat(event, config);
     }
   }
