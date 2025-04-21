@@ -25,6 +25,7 @@ package com.hidethemonkey.elfim.messaging;
 
 import com.google.gson.Gson;
 import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.helpers.NetworkUtils;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
@@ -74,7 +75,10 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("VERSION", server.getVersion());
     embed.addField("MAX PLAYERS", Integer.toString(server.getMaxPlayers()));
     embed.addField("GAME MODE", server.getDefaultGameMode().toString());
+    embed.addField("LOCAL IP", NetworkUtils.getLocalIP(server.getIp()));
+    embed.addField("EXTERNAL IP", NetworkUtils.getExternalIP());
     embed.addField("ELFIM VERSION", pluginVersion);
+
     DiscordMessage message = messageFactory.getMessage(embed);
     if (logPlugins) {
       Embed pluginEmbed = new Embed(config.getDiscordColor("serverPlugins"));

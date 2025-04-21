@@ -227,12 +227,17 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
    */
   @Override
   public void playerTeleport(PlayerTeleportEvent event, ELConfig config) {
+    String fromLoc = StringUtils.getLocationString(event.getFrom());
+    String toLoc = StringUtils.getLocationString(event.getTo());
+    if (fromLoc.equals(toLoc) || event.isCancelled()) {
+      return;
+    }
     Player player = event.getPlayer();
     Embed embed = new Embed(config.getDiscordColor("playerTeleport"));
     embed.setTitle("Teleported");
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription("From: **" + StringUtils.getLocationString(event.getFrom()) + "** To: **"
-        + StringUtils.getLocationString(event.getTo()) + "**");
+    embed.setDescription("From: **" + fromLoc + "** To: **" + toLoc + "** \nReason: **"
+        + event.getCause().toString() + "**");
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();

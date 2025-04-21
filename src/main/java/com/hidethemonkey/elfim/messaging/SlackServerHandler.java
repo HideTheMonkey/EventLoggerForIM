@@ -24,6 +24,7 @@
 package com.hidethemonkey.elfim.messaging;
 
 import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.helpers.NetworkUtils;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.ContextBlockElement;
 import com.slack.api.model.block.LayoutBlock;
@@ -68,6 +69,8 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*MAX PLAYERS:* " + server.getMaxPlayers()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
+            BlockBuilder.getMarkdown("*LOCAL IP:* " + NetworkUtils.getLocalIP(server.getIp())),
+            BlockBuilder.getMarkdown("*EXTERNAL IP:* " + NetworkUtils.getExternalIP()),
             BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
 
     String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
