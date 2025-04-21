@@ -212,11 +212,15 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerTeleport(PlayerTeleportEvent event, ELConfig config) {
     // List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player
     // Teleported");
+    String fromLoc = StringUtils.getLocationString(event.getFrom());
+    String toLoc = StringUtils.getLocationString(event.getTo());
+    if (fromLoc.equals(toLoc) || event.isCancelled()) {
+      return;
+    }
     Player player = event.getPlayer();
 
-    String message = "*" + player.getName() + "* teleported from *" + StringUtils.getLocationString(event.getFrom())
-        + "* to *"
-        + StringUtils.getLocationString(event.getTo()) + "*";
+    String message = "*" + player.getName() + "* teleported from *" + fromLoc
+        + "* to *" + toLoc + "* \nReason: *" + event.getCause().toString() + "*";
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }
