@@ -40,6 +40,7 @@ public class ELConfig {
   private final FileConfiguration config;
   private final Logger logger;
   private String pluginName = "";
+  private static boolean updateAvailable = false;
 
   public static final String REPLACE_ME = "replace-me";
   public static final String ENABLE_STATS = "enableStats";
@@ -255,6 +256,20 @@ public class ELConfig {
     return config.getBoolean(ENABLE_STATS);
   }
 
+  /**
+   * @param updateAvailable
+   */
+  public static void setUpdateAvailable(boolean updateAvailable) {
+    ELConfig.updateAvailable = updateAvailable;
+  }
+
+  /**
+   * @return boolean if this plugin has a newer version available
+   */
+  public static boolean getUpdateAvailable() {
+    return ELConfig.updateAvailable;
+  }
+
   ////////////////////////////////////////////////
   // Slack
   ////////////////////////////////////////////////
@@ -373,8 +388,7 @@ public class ELConfig {
         } catch (IOException | InvalidConfigurationException e) {
           plugin.getLogger().log(Level.SEVERE, "Error processing updated config.yml", e);
           // Something went wrong, so make sure the current config is saved. This could
-          // overwrite
-          // the current settings, but it's safer to have a current config.yml.
+          // overwrite the current settings, but it's safer to have a current config.yml.
           plugin.saveResource(file.getName(), true);
         }
       } else {

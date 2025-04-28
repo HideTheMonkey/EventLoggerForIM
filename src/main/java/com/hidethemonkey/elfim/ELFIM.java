@@ -349,6 +349,7 @@ public class ELFIM extends JavaPlugin {
     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
     DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getPluginMeta().getVersion());
     if (latestVersion.compareTo(currentVersion) > 0) {
+      ELConfig.setUpdateAvailable(true);
       getLogger().warning("****************************************************************************");
       getLogger().warning("* A new release of EventLoggerForIM is available!");
       getLogger().warning("*");
