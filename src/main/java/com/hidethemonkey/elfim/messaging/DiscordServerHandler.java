@@ -68,6 +68,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   public void startup(Server server, ELConfig config, boolean logPlugins) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
+    String updateAvailable = ELConfig.getUpdateAvailable() ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))" : "";
     Embed embed = new Embed(config.getDiscordColor("serverStartup"));
     embed.setTitle("**Server Started**");
     embed.addField("MOTD", ((TextComponent) server.motd()).content());
@@ -77,7 +78,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("GAME MODE", server.getDefaultGameMode().toString());
     embed.addField("LOCAL IP", NetworkUtils.getLocalIP(server.getIp()));
     embed.addField("EXTERNAL IP", NetworkUtils.getExternalIP());
-    embed.addField("ELFIM VERSION", pluginVersion);
+    embed.addField("ELFIM VERSION", pluginVersion + updateAvailable);
 
     DiscordMessage message = messageFactory.getMessage(embed);
     if (logPlugins) {
@@ -122,6 +123,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   public void shutdown(Server server, ELConfig config) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
+    String updateAvailable = ELConfig.getUpdateAvailable() ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))" : "";
     Embed embed = new Embed(config.getDiscordColor("serverShutdown"));
     embed.setTitle("**Server Stopping**");
     embed.addField("MOTD", ((TextComponent) server.motd()).content());
@@ -129,7 +131,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("VERSION", server.getVersion());
     embed.addField("ONLINE PLAYERS", Integer.toString(server.getOnlinePlayers().size()));
     embed.addField("GAME MODE", server.getDefaultGameMode().toString());
-    embed.addField("ELFIM VERSION", pluginVersion);
+    embed.addField("ELFIM VERSION", pluginVersion + updateAvailable);
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());

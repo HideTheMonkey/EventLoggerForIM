@@ -62,6 +62,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
   public void startup(Server server, ELConfig config, boolean logPlugins) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Started");
     String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
+    String updateAvailable = ELConfig.getUpdateAvailable() ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|update available>)" : "";
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
@@ -71,7 +72,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
             BlockBuilder.getMarkdown("*LOCAL IP:* " + NetworkUtils.getLocalIP(server.getIp())),
             BlockBuilder.getMarkdown("*EXTERNAL IP:* " + NetworkUtils.getExternalIP()),
-            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
+            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion + updateAvailable)));
 
     String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
         : ((TextComponent) server.motd()).content();
@@ -100,6 +101,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
   public void shutdown(Server server, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Stopping");
     String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
+    String updateAvailable = ELConfig.getUpdateAvailable() ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|update available>)" : "";
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
@@ -107,7 +109,7 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
             BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
             BlockBuilder.getMarkdown("*ONLINE PLAYERS:* " + server.getOnlinePlayers().size()),
             BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion)));
+            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion + updateAvailable)));
 
     String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
         : ((TextComponent) server.motd()).content();
