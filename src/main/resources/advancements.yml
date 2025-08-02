@@ -1,4 +1,4 @@
-advancement.advancementNotFound: Unknown advancement: %s
+advancement.advancementNotFound: Unknown advancement - %s
 adventure.adventuring_time.description: Discover every biome
 adventure.adventuring_time.title: Adventuring Time
 adventure.arbalistic.description: Kill five unique mobs with one crossbow shot
@@ -34,7 +34,7 @@ adventure.lighten_up.title: Lighten Up
 adventure.lightning_rod_with_villager_no_fire.description: Protect a Villager from an undesired shock without starting a fire
 adventure.lightning_rod_with_villager_no_fire.title: Surge Protector
 adventure.minecraft_trials_edition.description: Step foot in a Trial Chamber
-adventure.minecraft_trials_edition.title: Minecraft: Trial(s) Edition
+adventure.minecraft_trials_edition.title: Minecraft - Trial(s) Edition
 adventure.ol_betsy.description: Shoot a Crossbow
 adventure.ol_betsy.title: Ol' Betsy
 adventure.overoverkill.description: Deal 50 hearts of damage in a single hit using the Mace
@@ -63,7 +63,7 @@ adventure.spyglass_at_parrot.description: Look at a Parrot through a Spyglass
 adventure.spyglass_at_parrot.title: Is It a Bird?
 adventure.summon_iron_golem.description: Summon an Iron Golem to help defend a village
 adventure.summon_iron_golem.title: Hired Help
-adventure.throw_trident.description: Throw a Trident at something.\nNote: Throwing away your only weapon is not a good idea.
+adventure.throw_trident.description: Throw a Trident at something.\nNote, Throwing away your only weapon is not a good idea.
 adventure.throw_trident.title: A Throwaway Joke
 adventure.totem_of_undying.description: Use a Totem of Undying to cheat death
 adventure.totem_of_undying.title: Postmortal
@@ -71,7 +71,7 @@ adventure.trade_at_world_height.description: Trade with a Villager at the build 
 adventure.trade_at_world_height.title: Star Trader
 adventure.trade.description: Successfully trade with a Villager
 adventure.trade.title: What a Deal!
-adventure.trim_with_all_exclusive_armor_patterns.description: Apply these smithing templates at least once: Spire, Snout, Rib, Ward, Silence, Vex, Tide, Wayfinder
+adventure.trim_with_all_exclusive_armor_patterns.description: Apply these smithing templates at least once - Spire, Snout, Rib, Ward, Silence, Vex, Tide, Wayfinder
 adventure.trim_with_all_exclusive_armor_patterns.title: Smithing with Style
 adventure.trim_with_any_armor_pattern.description: Craft trimmed armor at a Smithing Table
 adventure.trim_with_any_armor_pattern.title: Crafting a New Look
@@ -218,7 +218,7 @@ nether.uneasy_alliance.description: Rescue a Ghast from the Nether, bring it saf
 nether.uneasy_alliance.title: Uneasy Alliance
 nether.use_lodestone.description: Use a Compass on a Lodestone
 nether.use_lodestone.title: Country Lode, Take Me Home
-progress: %s/%s
+progress: "%s/%s"
 sad_label: :(
 story.cure_zombie_villager.description: Weaken and then cure a Zombie Villager
 story.cure_zombie_villager.title: Zombie Doctor

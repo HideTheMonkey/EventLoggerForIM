@@ -40,7 +40,11 @@ public class AdvancementConfig {
      * @return
      */
     public String getAdvancementTitle(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".title");
+        String title = config.getString(key.replaceAll("/", ".") + ".title");
+        if (title == null || title.isEmpty()) {
+            return key;
+        }
+        return title;
     }
 
     /**
@@ -49,7 +53,11 @@ public class AdvancementConfig {
      * @return
      */
     public String getAdvancementDescription(String key) {
-        return config.getString(key.replaceAll("/", ".") + ".description");
+        String description = config.getString(key.replaceAll("/", ".") + ".description");
+        if (description == null || description.isEmpty()) {
+            return "unknown";
+        }
+        return description;
     }
 
     /**
@@ -58,6 +66,10 @@ public class AdvancementConfig {
      * @return
      */
     public String getAdvancement(String key) {
-        return config.getString(key.replaceAll("/", "."));
+        String value = config.getString(key.replaceAll("/", "."));
+        if (value == null || value.isEmpty()) {
+            return key;
+        }
+        return value;
     }
 }
