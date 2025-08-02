@@ -175,9 +175,11 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
       Embed embed = new Embed(config.getDiscordColor("playerAdvancement"));
       embed.setTitle("Made Advancement");
       embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
+      String advancementKey = event.getAdvancement().getKey().getKey().toString();
       embed.setDescription("`"
-          + advConfig.getAdvancementTitle(event.getAdvancement().getKey().getKey().toString())
-          + "`");
+          + advConfig.getAdvancementTitle(advancementKey) + "`\n(_"
+          + advConfig.getAdvancementDescription(advancementKey)
+          + "_)");
       DiscordMessage message = messageFactory.getMessage(embed);
 
       Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();

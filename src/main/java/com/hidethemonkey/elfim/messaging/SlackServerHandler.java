@@ -28,7 +28,9 @@ import com.hidethemonkey.elfim.helpers.NetworkUtils;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.ContextBlockElement;
 import com.slack.api.model.block.LayoutBlock;
+
 import org.bukkit.Server;
+import org.bukkit.Bukkit;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
@@ -85,7 +87,10 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
       e.printStackTrace();
     }
     if (logPlugins) {
-      listPlugins(server.getPluginManager(), config);
+      // delay task to ensure the plugins are fully loaded so we get an accurate state
+      Bukkit.getScheduler().runTaskLater(server.getPluginManager().getPlugin(config.getPluginName()), task -> {
+          listPlugins(server.getPluginManager(), config);
+      }, 1);
     }
     List<String> logProperties = config.getLogProperties();
     if (logProperties.size() > 0) {
@@ -130,7 +135,8 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Installed Plugins");
     ArrayList<ContextBlockElement> list = new ArrayList<>();
     for (Plugin plugin : plugins) {
-      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + ":* " + plugin.getPluginMeta().getVersion()));
+      String disabledString = plugin.isEnabled() ? ": " : " [_disabled_]: ";
+      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + "*" + disabledString + plugin.getPluginMeta().getVersion()));
     }
     blocks.add(BlockBuilder.getContextBlock(list));
     postBlocks(blocks, "List of plugins", config.getSlackChannelId(), config.getSlackAPIToken());

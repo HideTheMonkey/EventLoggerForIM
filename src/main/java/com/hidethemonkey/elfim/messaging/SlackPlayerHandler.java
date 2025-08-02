@@ -159,11 +159,13 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerAdvancement(
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
+      String advancementKey = event.getAdvancement().getKey().getKey().toString();
       String message = "*"
           + event.getPlayer().getName()
           + "* has made the advancement `"
-          + advConfig.getAdvancementTitle(event.getAdvancement().getKey().getKey().toString())
-          + "`";
+          + advConfig.getAdvancementTitle(advancementKey) + "`\n(_"
+          + advConfig.getAdvancementDescription(advancementKey)
+          + "_)";
       postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
     }
   }

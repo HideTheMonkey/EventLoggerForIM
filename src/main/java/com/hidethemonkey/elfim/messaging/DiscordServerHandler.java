@@ -30,6 +30,8 @@ import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
 import com.hidethemonkey.elfim.messaging.json.Embed;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
@@ -68,7 +70,9 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   public void startup(Server server, ELConfig config, boolean logPlugins) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
-    String updateAvailable = ELConfig.getUpdateAvailable() ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))" : "";
+    String updateAvailable = ELConfig.getUpdateAvailable()
+        ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
+        : "";
     Embed embed = new Embed(config.getDiscordColor("serverStartup"));
     embed.setTitle("**Server Started**");
     embed.addField("MOTD", ((TextComponent) server.motd()).content());
@@ -81,38 +85,42 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     embed.addField("ELFIM VERSION", pluginVersion + updateAvailable);
 
     DiscordMessage message = messageFactory.getMessage(embed);
-    if (logPlugins) {
-      Embed pluginEmbed = new Embed(config.getDiscordColor("serverPlugins"));
-      pluginEmbed.setTitle("**Installed Plugins**");
-      Plugin[] plugins = server.getPluginManager().getPlugins();
-      for (Plugin installedPlugin : plugins) {
-        pluginEmbed.addField(installedPlugin.getName(), installedPlugin.getPluginMeta().getVersion());
-      }
-      message.addEmbed(pluginEmbed);
-    }
-    List<String> logProperties = config.getLogProperties();
-    if (logProperties.size() > 0) {
-      Embed propertiesEmbed = new Embed(config.getDiscordColor("serverProperties"));
-      propertiesEmbed.setTitle("**Server Properties**");
-      Properties props = new Properties();
-      try {
-        props.load(new FileInputStream("server.properties"));
-        for (String key : logProperties) {
-          String value = props.getProperty(key);
-          if (value == null) {
-            value = "";
-          }
-          propertiesEmbed.addField(key, value);
+    // delay task to ensure the plugins are fully loaded so we get an accurate state
+    Bukkit.getScheduler().runTaskLater(server.getPluginManager().getPlugin(config.getPluginName()), task -> {
+      if (logPlugins) {
+        Embed pluginEmbed = new Embed(config.getDiscordColor("serverPlugins"));
+        pluginEmbed.setTitle("**Installed Plugins**");
+        Plugin[] plugins = server.getPluginManager().getPlugins();
+        for (Plugin installedPlugin : plugins) {
+          String disabledString = plugin.isEnabled() ? "" : " [_disabled_]";
+          pluginEmbed.addField(installedPlugin.getName() + disabledString, installedPlugin.getPluginMeta().getVersion());
         }
-      } catch (Exception e) {
-        propertiesEmbed.addField("Error", e.getLocalizedMessage());
-        e.printStackTrace();
+        message.addEmbed(pluginEmbed);
+      }
+      List<String> logProperties = config.getLogProperties();
+      if (logProperties.size() > 0) {
+        Embed propertiesEmbed = new Embed(config.getDiscordColor("serverProperties"));
+        propertiesEmbed.setTitle("**Server Properties**");
+        Properties props = new Properties();
+        try {
+          props.load(new FileInputStream("server.properties"));
+          for (String key : logProperties) {
+            String value = props.getProperty(key);
+            if (value == null) {
+              value = "";
+            }
+            propertiesEmbed.addField(key, value);
+          }
+        } catch (Exception e) {
+          propertiesEmbed.addField("Error", e.getLocalizedMessage());
+          e.printStackTrace();
+        }
+
+        message.addEmbed(propertiesEmbed);
       }
 
-      message.addEmbed(propertiesEmbed);
-    }
-
-    postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());
+      postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());
+    }, 1);
   }
 
   /**
@@ -123,7 +131,9 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   public void shutdown(Server server, ELConfig config) {
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
-    String updateAvailable = ELConfig.getUpdateAvailable() ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))" : "";
+    String updateAvailable = ELConfig.getUpdateAvailable()
+        ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
+        : "";
     Embed embed = new Embed(config.getDiscordColor("serverShutdown"));
     embed.setTitle("**Server Stopping**");
     embed.addField("MOTD", ((TextComponent) server.motd()).content());
