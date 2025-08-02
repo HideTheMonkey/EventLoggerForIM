@@ -92,7 +92,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
         pluginEmbed.setTitle("**Installed Plugins**");
         Plugin[] plugins = server.getPluginManager().getPlugins();
         for (Plugin installedPlugin : plugins) {
-          String disabledString = plugin.isEnabled() ? "" : " [_disabled_]";
+          String disabledString = installedPlugin.isEnabled() ? "" : " [_disabled_]";
           pluginEmbed.addField(installedPlugin.getName() + disabledString, installedPlugin.getPluginMeta().getVersion());
         }
         message.addEmbed(pluginEmbed);
