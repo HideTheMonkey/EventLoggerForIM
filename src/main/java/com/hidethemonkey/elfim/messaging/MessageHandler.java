@@ -23,6 +23,7 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
+import com.hidethemonkey.elfim.helpers.Localizer;
 import com.slack.api.Slack;
 import com.slack.api.SlackConfig;
 import com.slack.api.model.block.LayoutBlock;
@@ -38,6 +39,16 @@ public abstract class MessageHandler {
   private final Slack slack = Slack.getInstance(new SlackConfig());
   private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
   private final OkHttpClient client = new OkHttpClient();
+  protected final Localizer localizer;
+
+  /**
+   * Constructor for MessageHandler passing the Localizer
+   * 
+   * @param localizer
+   */
+  public MessageHandler(Localizer localizer) {
+    this.localizer = localizer;
+  }
 
   /**
    * @param url

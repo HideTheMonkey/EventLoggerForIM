@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
 import com.hidethemonkey.elfim.ELFIM;
+import com.hidethemonkey.elfim.helpers.Localizer;
 import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
@@ -51,7 +52,8 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   private final Gson gson = new Gson();
   private DiscordMessageFactory messageFactory;
 
-  public DiscordPlayerHandler(DiscordMessageFactory messageFactory) {
+  public DiscordPlayerHandler(DiscordMessageFactory messageFactory, Localizer localizer) {
+    super(localizer);
     this.messageFactory = messageFactory;
   }
 

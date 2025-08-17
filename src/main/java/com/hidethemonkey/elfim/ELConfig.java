@@ -270,6 +270,13 @@ public class ELConfig {
     return ELConfig.updateAvailable;
   }
 
+  /**
+   * @return the locale set in config.yml
+   */
+  public String getLocale() {
+    return config.getString("locale");
+  }
+
   ////////////////////////////////////////////////
   // Slack
   ////////////////////////////////////////////////
