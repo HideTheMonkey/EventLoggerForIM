@@ -23,21 +23,26 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.hidethemonkey.elfim.helpers.Localizer;
-import com.slack.api.Slack;
-import com.slack.api.SlackConfig;
-import com.slack.api.model.block.LayoutBlock;
-import okhttp3.*;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.slack.api.Slack;
+import com.slack.api.SlackConfig;
+import com.slack.api.model.block.LayoutBlock;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public abstract class MessageHandler {
 
   private final Slack slack = Slack.getInstance(new SlackConfig());
-  private final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+  private final MediaType JSON = MediaType.get("application/json; charset=utf-8" );
   private final OkHttpClient client = new OkHttpClient();
   protected final Localizer localizer;
 

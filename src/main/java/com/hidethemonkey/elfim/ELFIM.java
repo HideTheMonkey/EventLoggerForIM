@@ -23,23 +23,27 @@
  */
 package com.hidethemonkey.elfim;
 
+import java.util.Objects;
+
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.hidethemonkey.elfim.commands.CommandELFS;
 import com.hidethemonkey.elfim.helpers.Localizer;
 import com.hidethemonkey.elfim.helpers.VersionChecker;
 import com.hidethemonkey.elfim.helpers.VersionData;
 import com.hidethemonkey.elfim.listeners.PlayerListeners;
 import com.hidethemonkey.elfim.listeners.ServerListeners;
-import com.hidethemonkey.elfim.messaging.*;
+import com.hidethemonkey.elfim.messaging.DiscordPlayerHandler;
+import com.hidethemonkey.elfim.messaging.DiscordServerHandler;
+import com.hidethemonkey.elfim.messaging.PlayerHandlerInterface;
+import com.hidethemonkey.elfim.messaging.ServerHandlerInterface;
+import com.hidethemonkey.elfim.messaging.SlackPlayerHandler;
+import com.hidethemonkey.elfim.messaging.SlackServerHandler;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
-
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 public class ELFIM extends JavaPlugin {
 
@@ -64,6 +68,7 @@ public class ELFIM extends JavaPlugin {
     ELConfig.updateConfig(this);
     saveDefaultConfig();
     saveResource("i18n/en_US.properties", true);
+    saveResource("i18n/de.properties", true);
 
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
 

@@ -54,6 +54,9 @@ public class VersionChecker {
         } catch (IOException | InterruptedException e) {
             // do nothing
         }
+        finally {
+            client.close();
+        }
         return version;
     }
 }

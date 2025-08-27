@@ -23,28 +23,30 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.hidethemonkey.elfim.AdvancementConfig;
-import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.ELFIM;
-import com.hidethemonkey.elfim.helpers.Localizer;
-import com.hidethemonkey.elfim.helpers.StringUtils;
-import com.slack.api.model.block.LayoutBlock;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
-import org.bstats.charts.SimplePie;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
+import com.hidethemonkey.elfim.AdvancementConfig;
+import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.ELFIM;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.StringUtils;
+import com.slack.api.model.block.LayoutBlock;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
 
@@ -102,8 +104,10 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
 
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
-    plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> player.locale().toString()));
+    if (plugin != null) {
+      plugin.getMetrics().addCustomChart(
+          new SimplePie("player_locale", () -> player.locale().toString()));
+    }
   }
 
   /**
@@ -163,7 +167,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerAdvancement(
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
-      String advancementKey = event.getAdvancement().getKey().getKey().toString();
+      String advancementKey = event.getAdvancement().getKey().getKey();
       String message = localizer.t("slack.player.advancement_template", event.getPlayer().getName(),
           advConfig.getAdvancementTitle(advancementKey), advConfig.getAdvancementDescription(advancementKey));
       postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());

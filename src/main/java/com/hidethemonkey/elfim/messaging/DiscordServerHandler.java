@@ -23,7 +23,20 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.event.server.BroadcastMessageEvent;
+import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.Plugin;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hidethemonkey.elfim.ELConfig;
 import com.hidethemonkey.elfim.helpers.Localizer;
 import com.hidethemonkey.elfim.helpers.NetworkUtils;
@@ -32,23 +45,12 @@ import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
 import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
 import com.hidethemonkey.elfim.messaging.json.Embed;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.event.server.BroadcastMessageEvent;
-import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.plugin.Plugin;
-
 import net.kyori.adventure.text.TextComponent;
-
-import java.io.FileInputStream;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 public class DiscordServerHandler extends MessageHandler implements ServerHandlerInterface {
 
-  private final Gson gson = new Gson();
-  private DiscordMessageFactory messageFactory;
+  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private final DiscordMessageFactory messageFactory;
 
   public DiscordServerHandler(DiscordMessageFactory messageFactory, Localizer localizer) {
     super(localizer);
@@ -102,7 +104,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
         message.addEmbed(pluginEmbed);
       }
       List<String> logProperties = config.getLogProperties();
-      if (logProperties.size() > 0) {
+      if (!logProperties.isEmpty()) {
         Embed propertiesEmbed = new Embed(config.getDiscordColor("serverProperties"));
         propertiesEmbed.setTitle(String.format("**%s**", localizer.t("server_properties")));
         Properties props = new Properties();
@@ -115,9 +117,8 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
             }
             propertiesEmbed.addField(key, value);
           }
-        } catch (Exception e) {
+        } catch (IOException e) {
           propertiesEmbed.addField(localizer.t("error"), e.getLocalizedMessage());
-          e.printStackTrace();
         }
 
         message.addEmbed(propertiesEmbed);
@@ -140,7 +141,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
             + "](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
         : "";
     Embed embed = new Embed(config.getDiscordColor("serverShutdown"));
-    embed.setTitle("**Server Stopping**");
+    embed.setTitle(localizer.t("server_stopping"));
     embed.addField(localizer.t("motd"), ((TextComponent) server.motd()).content());
     embed.addField(localizer.t("type"), server.getName());
     embed.addField(localizer.t("version"), server.getVersion());

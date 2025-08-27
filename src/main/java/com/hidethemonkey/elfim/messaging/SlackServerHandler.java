@@ -23,6 +23,20 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.event.server.BroadcastMessageEvent;
+import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+
 import com.hidethemonkey.elfim.ELConfig;
 import com.hidethemonkey.elfim.helpers.Localizer;
 import com.hidethemonkey.elfim.helpers.NetworkUtils;
@@ -30,20 +44,7 @@ import com.hidethemonkey.elfim.helpers.StringUtils;
 import com.slack.api.model.block.ContextBlockElement;
 import com.slack.api.model.block.LayoutBlock;
 
-import org.bukkit.Server;
-import org.bukkit.Bukkit;
-import org.bukkit.event.server.BroadcastMessageEvent;
-import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-
 import net.kyori.adventure.text.TextComponent;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 public class SlackServerHandler extends MessageHandler implements ServerHandlerInterface {
 
@@ -97,7 +98,6 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
       // give it some time to post before listing plugins and properties
       Thread.sleep(100);
     } catch (InterruptedException e) {
-      e.printStackTrace();
     }
     if (logPlugins) {
       // delay task to ensure the plugins are fully loaded so we get an accurate state
@@ -170,9 +170,8 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
       for (String key : properties) {
         list.add(BlockBuilder.getMarkdown("*" + key + ":* " + props.getProperty(key)));
       }
-    } catch (Exception e) {
+    } catch (IOException e) {
       list.add(BlockBuilder.getMarkdown(localizer.t("server.error_loading_properties", e.getLocalizedMessage())));
-      e.printStackTrace();
     }
 
     blocks.add(BlockBuilder.getContextBlock(list));

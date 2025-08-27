@@ -6,7 +6,7 @@ MCUserAvatarUrl: https://crafthead.net/avatar/
 MCUserBustUrl: https://crafthead.net/bust/
 
 # Specify the locale to use for messages (NOTE: must have a corresponding locale file in the plugin config folder)
-# example: ./plugins/EventLoggerForIM/i18n/en_US.properties or ./plugins/EventLoggerForIM/i18n/en.properties
+# example: ./plugins/EventLoggerForIM/i18n/en_US.properties or ./plugins/EventLoggerForIM/i18n/de.properties
 locale: en_US
 
 # enable or disable anonymous statistics collection with bStats.org

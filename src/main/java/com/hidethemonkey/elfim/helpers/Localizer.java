@@ -25,27 +25,31 @@ package com.hidethemonkey.elfim.helpers;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Locale;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Properties;
 
 public class Localizer {
-    private static final String DEFAULT_LOCALE = "en_US";
-    private static final String SUFFIX = ".properties";
-    private Properties properties;
-    private String configPath = "";
-    private String locale = "";
-    private Locale localeClass;
+    private final String DEFAULT_LOCALE = "en_US";
+    private final String SUFFIX = ".properties";
+
+    private final Properties properties;
+    private final String configPath;
+    private final String locale;
+    private final Locale localeClass;
 
     public Localizer(String pluginPath, String locale) {
         this.configPath = pluginPath + "/i18n/";
-        this.locale = locale;
         this.localeClass = Locale.forLanguageTag(locale);
+        this.locale = this.localeClass.toLanguageTag();
         // Load properties from the configured locale
-        properties = loadTranslations();
+        properties = loadTranslations(this.configPath, this.locale);
     }
 
     /**
@@ -75,20 +79,26 @@ public class Localizer {
      * 
      * @return Properties with translation strings
      */
-    private Properties loadTranslations() {
-        Properties properties = new Properties();
-        Path path = Paths.get(this.configPath + this.locale + SUFFIX);
+    private Properties loadTranslations(String configPath, String locale) {
+        Properties props = new Properties();
+        Path path = Paths.get(configPath + locale + SUFFIX);
         if (!Files.exists(path)) {
-            path = Paths.get(this.configPath + this.locale.split("_")[0] + SUFFIX);
+            path = Paths.get(configPath + locale.split("_")[0] + SUFFIX);
             if (!Files.exists(path)) {
-                path = Paths.get(this.configPath + DEFAULT_LOCALE + SUFFIX);
+                path = Paths.get(configPath + DEFAULT_LOCALE + SUFFIX);
             }
         }
         try (InputStream input = new FileInputStream(path.toString())) {
-            properties.load(input);
+            Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
+            props.load(reader);  // Use load(Reader) to support UTF-8
         } catch (IOException e) {
-            e.printStackTrace();
+            // Try to load default one more time
+            try (InputStream input = new FileInputStream(configPath + DEFAULT_LOCALE + SUFFIX)) {
+                Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
+                props.load(reader);  // Use load(Reader) to support UTF-8
+            }catch (IOException ex) {
+            }
         }
-        return properties;
+        return props;
     }
 }
