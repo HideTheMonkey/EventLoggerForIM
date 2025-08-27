@@ -96,7 +96,7 @@ public class Localizer {
             try (InputStream input = new FileInputStream(configPath + DEFAULT_LOCALE + SUFFIX)) {
                 Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
                 props.load(reader);  // Use load(Reader) to support UTF-8
-            }catch (IOException ex) {
+            } catch (IOException ex) {
             }
         }
         return props;
