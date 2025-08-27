@@ -197,8 +197,8 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
   @Override
   public void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger) {
     String message = String.format("*[%s]* ",
-        localizer.t("server.broadcast_message")
-            + StringUtils.removeSpecialChars(((TextComponent) event.message()).content()));
+        localizer.t("server.broadcast_message",
+            StringUtils.removeSpecialChars(((TextComponent) event.message()).content())));
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }
