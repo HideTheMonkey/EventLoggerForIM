@@ -40,10 +40,9 @@ public class VersionChecker {
                 .uri(URI.create("https://api.github.com/repos/hidethemonkey/EventLoggerForIM/releases/latest"))
                 .build();
 
-        HttpResponse<String> response;
         VersionData version = null;
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response != null && response.statusCode() == 200) {
                 JSONObject obj = new JSONObject(response.body());
@@ -51,10 +50,8 @@ public class VersionChecker {
                         obj.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"),
                         obj.getString("published_at"));
             }
+            client.close();
         } catch (IOException | InterruptedException e) {
-            // do nothing
-        }
-        finally {
             client.close();
         }
         return version;

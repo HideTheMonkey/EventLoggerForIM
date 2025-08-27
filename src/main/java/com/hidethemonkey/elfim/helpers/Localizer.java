@@ -69,6 +69,13 @@ public class Localizer {
         return properties.getProperty(key, key);
     }
 
+    /**
+     * t is for translate
+     * 
+     * @param key
+     * @param args
+     * @return
+     */
     public String t(String key, Object... args) {
         String template = t(key);
         return String.format(this.localeClass, template, args);
@@ -90,13 +97,14 @@ public class Localizer {
         }
         try (InputStream input = new FileInputStream(path.toString())) {
             Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
-            props.load(reader);  // Use load(Reader) to support UTF-8
+            props.load(reader); // Use load(Reader) to support UTF-8
         } catch (IOException e) {
             // Try to load default one more time
             try (InputStream input = new FileInputStream(configPath + DEFAULT_LOCALE + SUFFIX)) {
                 Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
-                props.load(reader);  // Use load(Reader) to support UTF-8
+                props.load(reader); // Use load(Reader) to support UTF-8
             } catch (IOException ex) {
+                // ignore
             }
         }
         return props;
