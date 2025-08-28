@@ -50,8 +50,10 @@ public class VersionChecker {
                         obj.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"),
                         obj.getString("published_at"));
             }
-            client.close();
         } catch (IOException | InterruptedException e) {
+            // do nothing
+        }
+        finally {
             client.close();
         }
         return version;
