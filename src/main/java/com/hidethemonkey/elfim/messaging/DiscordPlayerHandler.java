@@ -23,14 +23,9 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.google.gson.Gson;
-import com.hidethemonkey.elfim.AdvancementConfig;
-import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.ELFIM;
-import com.hidethemonkey.elfim.helpers.StringUtils;
-import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
-import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
-import com.hidethemonkey.elfim.messaging.json.Embed;
+import java.util.logging.Logger;
+
+import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
@@ -39,19 +34,28 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bstats.charts.SimplePie;
+
+import com.google.gson.Gson;
+import com.hidethemonkey.elfim.AdvancementConfig;
+import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.ELFIM;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.StringUtils;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
+import com.hidethemonkey.elfim.messaging.json.Embed;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-import java.util.logging.Logger;
-
 public class DiscordPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
 
   private final Gson gson = new Gson();
-  private DiscordMessageFactory messageFactory;
+  private final DiscordMessageFactory messageFactory;
 
-  public DiscordPlayerHandler(DiscordMessageFactory messageFactory) {
+  public DiscordPlayerHandler(DiscordMessageFactory messageFactory, Localizer localizer) {
+    super(localizer);
     this.messageFactory = messageFactory;
   }
 
@@ -70,7 +74,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   @Override
   public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
     Embed embed = new Embed(config.getDiscordColor("playerFailedLogin"));
-    embed.setTitle("Tried to Log in");
+    embed.setTitle(localizer.t("discord.player.attempted_login_title"));
     embed.addAuthor(event.getPlayer().getName(), config.getMCUserAvatarUrl(event.getPlayer().getUniqueId().toString()));
     embed.setDescription(((TextComponent) event.kickMessage()).content());
     DiscordMessage message = messageFactory.getMessage(embed);
@@ -85,17 +89,17 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   @Override
   public void playerJoin(Player player, ELConfig config) {
     Embed embed = new Embed(config.getDiscordColor("playerJoin"));
-    embed.setTitle("Joined Server");
+    embed.setTitle(localizer.t("discord.player.joined_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.addField("NAME", player.getName());
-    embed.addField("OP", Boolean.toString(player.isOp()));
-    embed.addField("LEVEL", Integer.toString(player.getLevel()));
-    embed.addField("ADDRESS", player.getAddress().getHostName());
-    embed.addField("EXP", Integer.toString(player.getTotalExperience()));
-    embed.addField("XYZ", StringUtils.getLocationString(player.getLocation()));
-    embed.addField("ONLINE PLAYERS", Integer.toString(player.getServer().getOnlinePlayers().size()));
-    embed.addField("WORLD", player.getWorld().getName());
-    embed.addField("GAME MODE", player.getGameMode().toString());
+    embed.addField(localizer.t("name"), player.getName());
+    embed.addField(localizer.t("op"), Boolean.toString(player.isOp()));
+    embed.addField(localizer.t("level"), Integer.toString(player.getLevel()));
+    embed.addField(localizer.t("address"), player.getAddress().getHostName());
+    embed.addField(localizer.t("exp"), Integer.toString(player.getTotalExperience()));
+    embed.addField(localizer.t("xyz"), StringUtils.getLocationString(player.getLocation()));
+    embed.addField(localizer.t("online_players"), Integer.toString(player.getServer().getOnlinePlayers().size()));
+    embed.addField(localizer.t("world"), player.getWorld().getName());
+    embed.addField(localizer.t("game_mode"), player.getGameMode().toString());
     embed.setImage(config.getMCUserBustUrl(player.getUniqueId().toString()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
@@ -115,12 +119,11 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   @Override
   public void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
-    String content = "Online count: **" + count + "/" + player.getServer().getMaxPlayers() + "**";
 
     Embed embed = new Embed(config.getDiscordColor("playerLeave"));
-    embed.setTitle("Left Server");
+    embed.setTitle(localizer.t("discord.player.left_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription(content);
+    embed.setDescription(localizer.t("discord.player.leave_template", count, player.getServer().getMaxPlayers()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
@@ -135,7 +138,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   public void playerChat(AsyncChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
     Embed embed = new Embed(config.getDiscordColor("playerChat"));
-    embed.setTitle("Said in Chat");
+    embed.setTitle(localizer.t("discord.player.chat_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
     embed.setDescription(((TextComponent) event.message()).content());
     DiscordMessage message = messageFactory.getMessage(embed);
@@ -153,7 +156,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   public void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
     Player player = event.getPlayer();
     Embed embed = new Embed(config.getDiscordColor("playerCommand"));
-    embed.setTitle("Issued Command");
+    embed.setTitle(localizer.t("discord.player.command_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
     embed.setDescription("`" + event.getMessage() + "`");
     DiscordMessage message = messageFactory.getMessage(embed);
@@ -173,9 +176,9 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
       Player player = event.getPlayer();
       Embed embed = new Embed(config.getDiscordColor("playerAdvancement"));
-      embed.setTitle("Made Advancement");
+      embed.setTitle(localizer.t("discord.player.advancement_title"));
       embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-      String advancementKey = event.getAdvancement().getKey().getKey().toString();
+      String advancementKey = event.getAdvancement().getKey().getKey();
       embed.setDescription("`"
           + advConfig.getAdvancementTitle(advancementKey) + "`\n(_"
           + advConfig.getAdvancementDescription(advancementKey)
@@ -195,7 +198,7 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
   public void playerDeath(PlayerDeathEvent event, ELConfig config) {
     Player player = event.getEntity();
     Embed embed = new Embed(config.getDiscordColor("playerDeath"));
-    embed.setTitle("Died");
+    embed.setTitle(localizer.t("discord.player.died_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
     String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
     embed.setDescription(deathMessage);
@@ -214,9 +217,10 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     Player player = event.getPlayer();
     RespawnReason reason = event.getRespawnReason();
     Embed embed = new Embed(config.getDiscordColor("playerRespawn"));
-    embed.setTitle("Respawned");
+    embed.setTitle(localizer.t("discord.player.respawned_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription(player.getName() + " respawned due to " + reason.toString() + ".");
+    embed.setDescription(localizer.t("discord.player.respawned_template",
+        player.getName(), reason.toString()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();
@@ -236,10 +240,10 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     }
     Player player = event.getPlayer();
     Embed embed = new Embed(config.getDiscordColor("playerTeleport"));
-    embed.setTitle("Teleported");
+    embed.setTitle(localizer.t("discord.player.teleported_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    embed.setDescription("From: **" + fromLoc + "** To: **" + toLoc + "** \nReason: **"
-        + event.getCause().toString() + "**");
+    embed.setDescription(localizer.t("discord.player.teleported_template",
+        player.getName(), fromLoc, toLoc, event.getCause().toString()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     Logger logger = player.getServer().getPluginManager().getPlugin(config.getPluginName()).getLogger();

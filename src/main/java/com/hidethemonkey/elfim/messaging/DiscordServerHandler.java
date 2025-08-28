@@ -23,13 +23,11 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.google.gson.Gson;
-import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.helpers.NetworkUtils;
-import com.hidethemonkey.elfim.helpers.StringUtils;
-import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
-import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
-import com.hidethemonkey.elfim.messaging.json.Embed;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -37,19 +35,25 @@ import org.bukkit.event.server.BroadcastMessageEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
 
-import net.kyori.adventure.text.TextComponent;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.NetworkUtils;
+import com.hidethemonkey.elfim.helpers.StringUtils;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessage;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
+import com.hidethemonkey.elfim.messaging.json.Embed;
 
-import java.io.FileInputStream;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Logger;
+import net.kyori.adventure.text.TextComponent;
 
 public class DiscordServerHandler extends MessageHandler implements ServerHandlerInterface {
 
-  private final Gson gson = new Gson();
-  private DiscordMessageFactory messageFactory;
+  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private final DiscordMessageFactory messageFactory;
 
-  public DiscordServerHandler(DiscordMessageFactory messageFactory) {
+  public DiscordServerHandler(DiscordMessageFactory messageFactory, Localizer localizer) {
+    super(localizer);
     this.messageFactory = messageFactory;
   }
 
@@ -71,36 +75,38 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
     String updateAvailable = ELConfig.getUpdateAvailable()
-        ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
+        ? " ([" + localizer.t("update_available")
+            + "](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
         : "";
     Embed embed = new Embed(config.getDiscordColor("serverStartup"));
-    embed.setTitle("**Server Started**");
-    embed.addField("MOTD", ((TextComponent) server.motd()).content());
-    embed.addField("TYPE", server.getName());
-    embed.addField("VERSION", server.getVersion());
-    embed.addField("MAX PLAYERS", Integer.toString(server.getMaxPlayers()));
-    embed.addField("GAME MODE", server.getDefaultGameMode().toString());
-    embed.addField("LOCAL IP", NetworkUtils.getLocalIP(server.getIp()));
-    embed.addField("EXTERNAL IP", NetworkUtils.getExternalIP());
-    embed.addField("ELFIM VERSION", pluginVersion + updateAvailable);
+    embed.setTitle(String.format("**%s**", localizer.t("server_started")));
+    embed.addField(localizer.t("motd"), ((TextComponent) server.motd()).content());
+    embed.addField(localizer.t("type"), server.getName());
+    embed.addField(localizer.t("version"), server.getVersion());
+    embed.addField(localizer.t("max_players"), Integer.toString(server.getMaxPlayers()));
+    embed.addField(localizer.t("game_mode"), server.getDefaultGameMode().toString());
+    embed.addField(localizer.t("local_ip"), NetworkUtils.getLocalIP(server.getIp()));
+    embed.addField(localizer.t("external_ip"), NetworkUtils.getExternalIP());
+    embed.addField(localizer.t("elfim_version"), pluginVersion + updateAvailable);
 
     DiscordMessage message = messageFactory.getMessage(embed);
     // delay task to ensure the plugins are fully loaded so we get an accurate state
     Bukkit.getScheduler().runTaskLater(server.getPluginManager().getPlugin(config.getPluginName()), task -> {
       if (logPlugins) {
         Embed pluginEmbed = new Embed(config.getDiscordColor("serverPlugins"));
-        pluginEmbed.setTitle("**Installed Plugins**");
+        pluginEmbed.setTitle(String.format("**%s**", localizer.t("installed_plugins")));
         Plugin[] plugins = server.getPluginManager().getPlugins();
         for (Plugin installedPlugin : plugins) {
-          String disabledString = installedPlugin.isEnabled() ? "" : " [_disabled_]";
-          pluginEmbed.addField(installedPlugin.getName() + disabledString, installedPlugin.getPluginMeta().getVersion());
+          String disabledString = installedPlugin.isEnabled() ? "" : String.format(" [_%s_]", localizer.t("disabled"));
+          pluginEmbed.addField(installedPlugin.getName() + disabledString,
+              installedPlugin.getPluginMeta().getVersion());
         }
         message.addEmbed(pluginEmbed);
       }
       List<String> logProperties = config.getLogProperties();
-      if (logProperties.size() > 0) {
+      if (!logProperties.isEmpty()) {
         Embed propertiesEmbed = new Embed(config.getDiscordColor("serverProperties"));
-        propertiesEmbed.setTitle("**Server Properties**");
+        propertiesEmbed.setTitle(String.format("**%s**", localizer.t("server_properties")));
         Properties props = new Properties();
         try {
           props.load(new FileInputStream("server.properties"));
@@ -111,9 +117,8 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
             }
             propertiesEmbed.addField(key, value);
           }
-        } catch (Exception e) {
-          propertiesEmbed.addField("Error", e.getLocalizedMessage());
-          e.printStackTrace();
+        } catch (IOException e) {
+          propertiesEmbed.addField(localizer.t("error"), e.getLocalizedMessage());
         }
 
         message.addEmbed(propertiesEmbed);
@@ -132,16 +137,17 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
     Plugin plugin = server.getPluginManager().getPlugin(config.getPluginName());
     String pluginVersion = plugin.getPluginMeta().getVersion();
     String updateAvailable = ELConfig.getUpdateAvailable()
-        ? " ([update available](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
+        ? " ([" + localizer.t("update_available")
+            + "](https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest))"
         : "";
     Embed embed = new Embed(config.getDiscordColor("serverShutdown"));
-    embed.setTitle("**Server Stopping**");
-    embed.addField("MOTD", ((TextComponent) server.motd()).content());
-    embed.addField("TYPE", server.getName());
-    embed.addField("VERSION", server.getVersion());
-    embed.addField("ONLINE PLAYERS", Integer.toString(server.getOnlinePlayers().size()));
-    embed.addField("GAME MODE", server.getDefaultGameMode().toString());
-    embed.addField("ELFIM VERSION", pluginVersion + updateAvailable);
+    embed.setTitle(localizer.t("server_stopping"));
+    embed.addField(localizer.t("motd"), ((TextComponent) server.motd()).content());
+    embed.addField(localizer.t("type"), server.getName());
+    embed.addField(localizer.t("version"), server.getVersion());
+    embed.addField(localizer.t("online_players"), Integer.toString(server.getOnlinePlayers().size()));
+    embed.addField(localizer.t("game_mode"), server.getDefaultGameMode().toString());
+    embed.addField(localizer.t("elfim_version"), pluginVersion + updateAvailable);
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), plugin.getLogger());
@@ -155,8 +161,8 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   @Override
   public void serverCommand(ServerCommandEvent event, ELConfig config, Logger logger) {
     Embed embed = new Embed(config.getDiscordColor("serverCommand"));
-    embed.setTitle("Server Command");
-    embed.setDescription("*" + event.getSender().getName() + "* issued command: `" + event.getCommand() + "`");
+    embed.setTitle(localizer.t("server_command"));
+    embed.setDescription(localizer.t("server.issued_command", event.getSender().getName(), event.getCommand()));
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
@@ -170,7 +176,7 @@ public class DiscordServerHandler extends MessageHandler implements ServerHandle
   @Override
   public void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger) {
     Embed embed = new Embed(config.getDiscordColor("serverBroadcast"));
-    embed.setTitle("Broadcast Message");
+    embed.setTitle(localizer.t("server.broadcast_message"));
     embed.setDescription(StringUtils.removeSpecialChars(((TextComponent) event.message()).content()));
     DiscordMessage message = messageFactory.getMessage(embed);
 

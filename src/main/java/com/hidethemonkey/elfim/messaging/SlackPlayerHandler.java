@@ -23,29 +23,36 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.hidethemonkey.elfim.AdvancementConfig;
-import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.ELFIM;
-import com.hidethemonkey.elfim.helpers.StringUtils;
-import com.slack.api.model.block.LayoutBlock;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
-import org.bstats.charts.SimplePie;
+import org.bukkit.event.player.PlayerTeleportEvent;
+
+import com.hidethemonkey.elfim.AdvancementConfig;
+import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.ELFIM;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.StringUtils;
+import com.slack.api.model.block.LayoutBlock;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
+
+  public SlackPlayerHandler(Localizer localizer) {
+    super(localizer);
+  }
 
   /**
    *
@@ -62,8 +69,8 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
-    String message = "*" + event.getPlayer().getName() + "* attempted to log in.\n"
-        + ((TextComponent) event.kickMessage()).content();
+    String message = localizer.t(
+        "slack.player.attempted_login", event.getPlayer().getName(), ((TextComponent) event.kickMessage()).content());
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -73,29 +80,34 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerJoin(Player player, ELConfig config) {
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Joined");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("slack.player.header.joined"));
     blocks.add(
         BlockBuilder.getSectionWithFields(
             BlockBuilder.getImageElement(
                 config.getMCUserBustUrl(player.getUniqueId().toString()), player.getName()),
-            BlockBuilder.getMarkdown("*NAME:* " + player.getName()),
-            BlockBuilder.getMarkdown("*ADDRESS:* " + player.getAddress().getHostName()),
-            BlockBuilder.getMarkdown("*OP:* " + player.isOp()),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("name"), player.getName())),
+            BlockBuilder
+                .getMarkdown(String.format("*%s:* %s", localizer.t("address"), player.getAddress().getHostName())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("op"), player.isOp())),
             BlockBuilder.getMarkdown(
-                "*ONLINE PLAYERS:* " + player.getServer().getOnlinePlayers().size()),
-            BlockBuilder.getMarkdown("*EXP:* " + player.getTotalExperience()),
-            BlockBuilder.getMarkdown("*LEVEL:* " + player.getLevel()),
-            BlockBuilder.getMarkdown("*WORLD:* " + player.getWorld().getName()),
-            BlockBuilder.getMarkdown("*XYZ:* " + StringUtils.getLocationString(player.getLocation())),
-            BlockBuilder.getMarkdown("*GAME MODE:* " + player.getGameMode().toString())));
+                String.format("*%s:* %d", localizer.t("online_players"), player.getServer().getOnlinePlayers().size())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %d", localizer.t("exp"), player.getTotalExperience())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %d", localizer.t("level"), player.getLevel())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("world"), player.getWorld().getName())),
+            BlockBuilder.getMarkdown(
+                String.format("*%s:* %s", localizer.t("xyz"), StringUtils.getLocationString(player.getLocation()))),
+            BlockBuilder
+                .getMarkdown(String.format("*%s:* %s", localizer.t("game_mode"), player.getGameMode().toString()))));
 
-    String message = player.getName() + " joined the server.";
-    postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
+    postBlocks(blocks, localizer.t("slack.player.joined_template", player.getName()), config.getSlackChannelId(),
+        config.getSlackAPIToken());
 
     // Track player locale
     ELFIM plugin = (ELFIM) player.getServer().getPluginManager().getPlugin(config.getPluginName());
-    plugin.getMetrics().addCustomChart(
-        new SimplePie("player_locale", () -> player.locale().toString()));
+    if (plugin != null) {
+      plugin.getMetrics().addCustomChart(
+          new SimplePie("player_locale", () -> player.locale().toString()));
+    }
   }
 
   /**
@@ -105,14 +117,9 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   @Override
   public void playerLeave(Player player, ELConfig config) {
     long count = player.getServer().getOnlinePlayers().size() - 1;
-    String message = "*"
-        + player.getName()
-        + "* left the server! Online count: *"
-        + count
-        + "/"
-        + player.getServer().getMaxPlayers()
-        + "*";
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Left");
+    String message = localizer.t("slack.player.leave_template", player.getName(), count,
+        player.getServer().getMaxPlayers());
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("slack.player.header.left"));
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(
@@ -129,7 +136,8 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   @Override
   public void playerChat(AsyncChatEvent event, ELConfig config) {
     Player player = event.getPlayer();
-    String message = "*" + player.getName() + "* said: " + ((TextComponent) event.message()).content();
+    String message = localizer.t("slack.player.chat_template", player.getName(),
+        ((TextComponent) event.message()).content());
     List<LayoutBlock> blocks = new ArrayList<>();
     blocks.add(
         BlockBuilder.getContextBlock(
@@ -146,7 +154,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerCommand(PlayerCommandPreprocessEvent event, ELConfig config) {
-    String message = "*" + event.getPlayer().getName() + "* issued command: `" + event.getMessage() + "`";
+    String message = localizer.t("slack.player.command_template", event.getPlayer().getName(), event.getMessage());
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -159,13 +167,9 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerAdvancement(
       PlayerAdvancementDoneEvent event, ELConfig config, AdvancementConfig advConfig) {
     if (!event.getAdvancement().getKey().getKey().startsWith("recipes")) {
-      String advancementKey = event.getAdvancement().getKey().getKey().toString();
-      String message = "*"
-          + event.getPlayer().getName()
-          + "* has made the advancement `"
-          + advConfig.getAdvancementTitle(advancementKey) + "`\n(_"
-          + advConfig.getAdvancementDescription(advancementKey)
-          + "_)";
+      String advancementKey = event.getAdvancement().getKey().getKey();
+      String message = localizer.t("slack.player.advancement_template", event.getPlayer().getName(),
+          advConfig.getAdvancementTitle(advancementKey), advConfig.getAdvancementDescription(advancementKey));
       postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
     }
   }
@@ -176,7 +180,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerDeath(PlayerDeathEvent event, ELConfig config) {
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Died");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("slack.player.header.died"));
     Player player = event.getEntity();
     String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
     blocks.add(
@@ -194,16 +198,18 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    */
   @Override
   public void playerRespawn(PlayerRespawnEvent event, ELConfig config) {
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Player Respawned");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("slack.player.header.respawned"));
     Player player = event.getPlayer();
     RespawnReason reason = event.getRespawnReason();
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(
                 config.getMCUserAvatarUrl(player.getUniqueId().toString()), player.getName()),
-            BlockBuilder.getMarkdown(player.getName() + " respawned due to " + reason.toString() + ".")));
+            BlockBuilder.getMarkdown(
+                localizer.t("slack.player.respawned_template", player.getName(), reason.toString()))));
 
-    postBlocks(blocks, player.getName() + " respawned.", config.getSlackChannelId(), config.getSlackAPIToken());
+    postBlocks(blocks, localizer.t("slack.player.body.respawn_template", player.getName()), config.getSlackChannelId(),
+        config.getSlackAPIToken());
   }
 
   /**
@@ -221,8 +227,8 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
     }
     Player player = event.getPlayer();
 
-    String message = "*" + player.getName() + "* teleported from *" + fromLoc
-        + "* to *" + toLoc + "* \nReason: *" + event.getCause().toString() + "*";
+    String message = localizer.t("slack.player.teleported_template", player.getName(), fromLoc, toLoc,
+        event.getCause().toString());
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }

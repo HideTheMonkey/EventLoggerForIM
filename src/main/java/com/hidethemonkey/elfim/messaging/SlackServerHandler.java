@@ -23,28 +23,34 @@
  */
 package com.hidethemonkey.elfim.messaging;
 
-import com.hidethemonkey.elfim.ELConfig;
-import com.hidethemonkey.elfim.helpers.NetworkUtils;
-import com.hidethemonkey.elfim.helpers.StringUtils;
-import com.slack.api.model.block.ContextBlockElement;
-import com.slack.api.model.block.LayoutBlock;
-
-import org.bukkit.Server;
-import org.bukkit.Bukkit;
-import org.bukkit.event.server.BroadcastMessageEvent;
-import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-
-import net.kyori.adventure.text.TextComponent;
-
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.event.server.BroadcastMessageEvent;
+import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+
+import com.hidethemonkey.elfim.ELConfig;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.NetworkUtils;
+import com.hidethemonkey.elfim.helpers.StringUtils;
+import com.slack.api.model.block.ContextBlockElement;
+import com.slack.api.model.block.LayoutBlock;
+
+import net.kyori.adventure.text.TextComponent;
+
 public class SlackServerHandler extends MessageHandler implements ServerHandlerInterface {
+
+  public SlackServerHandler(Localizer localizer) {
+    super(localizer);
+  }
 
   /**
    *
@@ -62,39 +68,46 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void startup(Server server, ELConfig config, boolean logPlugins) {
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Started");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("server_started"));
     String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
-    String updateAvailable = ELConfig.getUpdateAvailable() ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|update available>)" : "";
+    String updateAvailable = ELConfig.getUpdateAvailable()
+        ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|" + localizer.t("update_available")
+            + ">)"
+        : "";
     blocks.add(
         BlockBuilder.getContextBlock(
-            BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
-            BlockBuilder.getMarkdown("*TYPE:* " + server.getName()),
-            BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
-            BlockBuilder.getMarkdown("*MAX PLAYERS:* " + server.getMaxPlayers()),
-            BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*LOCAL IP:* " + NetworkUtils.getLocalIP(server.getIp())),
-            BlockBuilder.getMarkdown("*EXTERNAL IP:* " + NetworkUtils.getExternalIP()),
-            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion + updateAvailable)));
+            BlockBuilder
+                .getMarkdown(String.format("*%s:* %s", localizer.t("motd"), ((TextComponent) server.motd()).content())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("type"), server.getName())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("version"), server.getVersion())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %d", localizer.t("max_players"), server.getMaxPlayers())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("game_mode"), server.getDefaultGameMode())),
+            BlockBuilder.getMarkdown(
+                String.format("*%s:* %s", localizer.t("local_ip"), NetworkUtils.getLocalIP(server.getIp()))),
+            BlockBuilder
+                .getMarkdown(String.format("*%s:* %s", localizer.t("external_ip"), NetworkUtils.getExternalIP())),
+            BlockBuilder
+                .getMarkdown(
+                    String.format("*%s:* %s", localizer.t("elfim_version"), pluginVersion + updateAvailable))));
 
     String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
         : ((TextComponent) server.motd()).content();
-    String message = "Minecraft server `" + serverName + "` is now online.";
+    String message = localizer.t("slack.server_online", serverName);
     postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
     try {
       // give it some time to post before listing plugins and properties
       Thread.sleep(100);
     } catch (InterruptedException e) {
-      e.printStackTrace();
     }
     if (logPlugins) {
       // delay task to ensure the plugins are fully loaded so we get an accurate state
       Bukkit.getScheduler().runTaskLater(server.getPluginManager().getPlugin(config.getPluginName()), task -> {
-          listPlugins(server.getPluginManager(), config);
+        listPlugins(server.getPluginManager(), config);
       }, 1);
     }
     List<String> logProperties = config.getLogProperties();
     if (logProperties.size() > 0) {
-      listPproperties(server.getPluginManager(), config, logProperties);
+      listProperties(server.getPluginManager(), config, logProperties);
     }
   }
 
@@ -104,26 +117,30 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void shutdown(Server server, ELConfig config) {
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Stopping");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("server_stopping"));
     String pluginVersion = server.getPluginManager().getPlugin(config.getPluginName()).getPluginMeta().getVersion();
-    String updateAvailable = ELConfig.getUpdateAvailable() ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|update available>)" : "";
+    String updateAvailable = ELConfig.getUpdateAvailable()
+        ? " (<https://github.com/HideTheMonkey/EventLoggerForIM/releases/latest|" + localizer.t("update_available")
+            + ">)"
+        : "";
     blocks.add(
         BlockBuilder.getContextBlock(
-            BlockBuilder.getMarkdown("*MOTD:* " + ((TextComponent) server.motd()).content()),
-            BlockBuilder.getMarkdown("*TYPE:* " + server.getName()),
-            BlockBuilder.getMarkdown("*VERSION:* " + server.getVersion()),
-            BlockBuilder.getMarkdown("*ONLINE PLAYERS:* " + server.getOnlinePlayers().size()),
-            BlockBuilder.getMarkdown("*GAME MODE:* " + server.getDefaultGameMode()),
-            BlockBuilder.getMarkdown("*ELFIM VERSION:* " + pluginVersion + updateAvailable)));
+            BlockBuilder
+                .getMarkdown(String.format("*%s:* %s", localizer.t("motd"), ((TextComponent) server.motd()).content())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("type"), server.getName())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("version"), server.getVersion())),
+            BlockBuilder
+                .getMarkdown(
+                    String.format("*%s:* %d", localizer.t("online_players"), server.getOnlinePlayers().size())),
+            BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("game_mode"), server.getDefaultGameMode())),
+            BlockBuilder
+                .getMarkdown(
+                    String.format("*%s:* %s", localizer.t("elfim_version"), pluginVersion + updateAvailable))));
 
     String serverName = ((TextComponent) server.motd()).content().isBlank() ? server.getName()
         : ((TextComponent) server.motd()).content();
-    String message = "`"
-        + serverName
-        + "` is shutting down! Players still online: *"
-        + server.getOnlinePlayers().size()
-        + "*";
-    postBlocks(blocks, message, config.getSlackChannelId(), config.getSlackAPIToken());
+    postBlocks(blocks, localizer.t("server_shutdown", serverName, server.getOnlinePlayers().size()),
+        config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
@@ -132,33 +149,33 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   private void listPlugins(PluginManager manager, ELConfig config) {
     Plugin[] plugins = manager.getPlugins();
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Installed Plugins");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("installed_plugins"));
     ArrayList<ContextBlockElement> list = new ArrayList<>();
     for (Plugin plugin : plugins) {
-      String disabledString = plugin.isEnabled() ? ": " : " [_disabled_]: ";
-      list.add(BlockBuilder.getMarkdown("*" + plugin.getName() + "*" + disabledString + plugin.getPluginMeta().getVersion()));
+      String disabledString = plugin.isEnabled() ? ": " : String.format(" [_%s_]: ", localizer.t("disabled"));
+      list.add(BlockBuilder
+          .getMarkdown("*" + plugin.getName() + "*" + disabledString + plugin.getPluginMeta().getVersion()));
     }
     blocks.add(BlockBuilder.getContextBlock(list));
-    postBlocks(blocks, "List of plugins", config.getSlackChannelId(), config.getSlackAPIToken());
+    postBlocks(blocks, localizer.t("list_of_plugins"), config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
-  private void listPproperties(PluginManager manager, ELConfig config, List<String> properties) {
+  private void listProperties(PluginManager manager, ELConfig config, List<String> properties) {
     Properties props = new Properties();
     ArrayList<ContextBlockElement> list = new ArrayList<>();
-    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader("Server Properties");
+    List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("server_properties"));
 
     try {
       props.load(new FileInputStream("server.properties"));
       for (String key : properties) {
         list.add(BlockBuilder.getMarkdown("*" + key + ":* " + props.getProperty(key)));
       }
-    } catch (Exception e) {
-      list.add(BlockBuilder.getMarkdown("Error loading server.properties: " + e.getLocalizedMessage()));
-      e.printStackTrace();
+    } catch (IOException e) {
+      list.add(BlockBuilder.getMarkdown(localizer.t("server.error_loading_properties", e.getLocalizedMessage())));
     }
 
     blocks.add(BlockBuilder.getContextBlock(list));
-    postBlocks(blocks, "List of properties", config.getSlackChannelId(), config.getSlackAPIToken());
+    postBlocks(blocks, localizer.t("server.list_of_properties"), config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
@@ -168,8 +185,8 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void serverCommand(ServerCommandEvent event, ELConfig config, Logger logger) {
-    String message = "*" + event.getSender().getName() + "* issued server command: `" + event.getCommand() + "`";
-    postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
+    postMessage(localizer.t("server.issued_command", event.getSender().getName(), event.getCommand()),
+        config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
   /**
@@ -179,7 +196,9 @@ public class SlackServerHandler extends MessageHandler implements ServerHandlerI
    */
   @Override
   public void broadcastChat(BroadcastMessageEvent event, ELConfig config, Logger logger) {
-    String message = "*[BROADCAST]* " + StringUtils.removeSpecialChars(((TextComponent) event.message()).content());
+    String message = String.format("*[%s]* ",
+        localizer.t("server.broadcast_message",
+            StringUtils.removeSpecialChars(((TextComponent) event.message()).content())));
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 }

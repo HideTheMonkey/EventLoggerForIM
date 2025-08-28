@@ -23,28 +23,34 @@
  */
 package com.hidethemonkey.elfim;
 
-import com.hidethemonkey.elfim.commands.CommandELFS;
-import com.hidethemonkey.elfim.helpers.VersionChecker;
-import com.hidethemonkey.elfim.helpers.VersionData;
-import com.hidethemonkey.elfim.listeners.PlayerListeners;
-import com.hidethemonkey.elfim.listeners.ServerListeners;
-import com.hidethemonkey.elfim.messaging.*;
-import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
+import java.util.Objects;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
+import com.hidethemonkey.elfim.commands.CommandELFS;
+import com.hidethemonkey.elfim.helpers.Localizer;
+import com.hidethemonkey.elfim.helpers.VersionChecker;
+import com.hidethemonkey.elfim.helpers.VersionData;
+import com.hidethemonkey.elfim.listeners.PlayerListeners;
+import com.hidethemonkey.elfim.listeners.ServerListeners;
+import com.hidethemonkey.elfim.messaging.DiscordPlayerHandler;
+import com.hidethemonkey.elfim.messaging.DiscordServerHandler;
+import com.hidethemonkey.elfim.messaging.PlayerHandlerInterface;
+import com.hidethemonkey.elfim.messaging.ServerHandlerInterface;
+import com.hidethemonkey.elfim.messaging.SlackPlayerHandler;
+import com.hidethemonkey.elfim.messaging.SlackServerHandler;
+import com.hidethemonkey.elfim.messaging.json.DiscordMessageFactory;
 
 public class ELFIM extends JavaPlugin {
 
   private DiscordMessageFactory messageFactory;
   private Metrics metrics;
   private VersionData versionData;
+  private Localizer localizer;
 
   /**
    * 
@@ -61,11 +67,16 @@ public class ELFIM extends JavaPlugin {
   public void onEnable() {
     ELConfig.updateConfig(this);
     saveDefaultConfig();
+    saveResource("i18n/en_US.properties", true);
+    saveResource("i18n/de.properties", true);
 
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
 
     // Store name on config for easy access later (not saved to file)
     elConfig.setPluginName(this.getName());
+
+    this.localizer = new Localizer(this.getConfig().getCurrentPath() + "plugins/" + this.getName(),
+        elConfig.getLocale());
 
     // Check for new versions
     compareVersions();
@@ -82,10 +93,10 @@ public class ELFIM extends JavaPlugin {
         registerServerListeners(ELConfig.SLACK, elConfig, getServer().getPluginManager());
         registerPlayerListeners(ELConfig.SLACK, elConfig, advConfig, getServer().getPluginManager());
       } else {
-        getLogger().warning("The Slack API token or channel is not configured!");
+        getLogger().warning(localizer.t("slack.warn.api_not_configured"));
       }
     } else {
-      getLogger().info("Slack integration is not enabled.");
+      getLogger().info(localizer.t("slack.info.not_enabled"));
     }
 
     // DISCORD
@@ -94,7 +105,7 @@ public class ELFIM extends JavaPlugin {
       registerServerListeners(ELConfig.DISCORD, elConfig, getServer().getPluginManager());
       registerPlayerListeners(ELConfig.DISCORD, elConfig, advConfig, getServer().getPluginManager());
     } else {
-      getLogger().info("Discord integration is not enabled.");
+      getLogger().info(localizer.t("discord.info.not_enabled"));
     }
 
     // Register configuration commands
@@ -115,6 +126,15 @@ public class ELFIM extends JavaPlugin {
    */
   public Metrics getMetrics() {
     return metrics;
+  }
+
+  /**
+   * Gets the localizer for translation.
+   * 
+   * @return
+   */
+  public Localizer getLocalizer() {
+    return localizer;
   }
 
   /**
@@ -212,10 +232,12 @@ public class ELFIM extends JavaPlugin {
               .toString(config.getLogPlayerTeleport(ELConfig.DISCORD));
         }));
 
+        this.metrics.addCustomChart(new SimplePie("translation_locale", () -> {
+          return localizer.getLocale();
+        }));
+
       } else {
-        getLogger()
-            .info(
-                "bStats is not enabled! Please consider activating this service to help me keep track of ELFIM usage. 🙇");
+        getLogger().info(localizer.t("metrics.info.not_enabled"));
       }
     }
   }
@@ -291,7 +313,7 @@ public class ELFIM extends JavaPlugin {
    */
   private boolean checkSlackChannel(String channelId) {
     if (channelId.isBlank() || channelId.equals(ELConfig.REPLACE_ME)) {
-      getLogger().severe("The Slack channel must be set in /plugin/EventLoggerForIM/config.yml!");
+      getLogger().severe(localizer.t("slack.error.channel_not_set"));
       return false;
     }
     return true;
@@ -303,7 +325,7 @@ public class ELFIM extends JavaPlugin {
    */
   private boolean checkSlackToken(String token) {
     if (token.isBlank() || token.equals(ELConfig.REPLACE_ME)) {
-      getLogger().severe("The Slack API token must be set in /plugin/EventLoggerForIM/config.yml!");
+      getLogger().severe(localizer.t("slack.error.token_not_set"));
       return false;
     }
     return true;
@@ -315,10 +337,10 @@ public class ELFIM extends JavaPlugin {
    */
   private ServerHandlerInterface getServerHandler(String service) {
     if (service.equals(ELConfig.SLACK)) {
-      return new SlackServerHandler();
+      return new SlackServerHandler(localizer);
     }
     if (service.equals(ELConfig.DISCORD)) {
-      return new DiscordServerHandler(messageFactory);
+      return new DiscordServerHandler(messageFactory, localizer);
     }
     return null;
   }
@@ -329,10 +351,10 @@ public class ELFIM extends JavaPlugin {
    */
   private PlayerHandlerInterface getPlayerHandler(String service) {
     if (service.equals(ELConfig.SLACK)) {
-      return new SlackPlayerHandler();
+      return new SlackPlayerHandler(localizer);
     }
     if (service.equals(ELConfig.DISCORD)) {
-      return new DiscordPlayerHandler(messageFactory);
+      return new DiscordPlayerHandler(messageFactory, localizer);
     }
     return null;
   }
@@ -342,8 +364,7 @@ public class ELFIM extends JavaPlugin {
   */
   private void compareVersions() {
     if (versionData == null) {
-      getLogger().warning(
-          "Could not check for new versions. Please see https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM for updates.");
+      getLogger().warning(localizer.t("version.check_failed"));
       return;
     }
     DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
@@ -351,13 +372,13 @@ public class ELFIM extends JavaPlugin {
     if (latestVersion.compareTo(currentVersion) > 0) {
       ELConfig.setUpdateAvailable(true);
       getLogger().warning("****************************************************************************");
-      getLogger().warning("* A new release of EventLoggerForIM is available!");
+      getLogger().warning("* " + localizer.t("version.new_release_available"));
       getLogger().warning("*");
-      getLogger().warning("* New version: " + versionData.getVersion());
-      getLogger().warning("* Your version: " + getPluginMeta().getVersion());
+      getLogger().warning("* " + localizer.t("version.new_version", versionData.getVersion()));
+      getLogger().warning("* " + localizer.t("version.your_version", getPluginMeta().getVersion()));
       getLogger().warning("*");
-      getLogger().warning("* Please update to take advantage of the latest features and bug fixes.");
-      getLogger().warning("* Download here: https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM");
+      getLogger().warning("* " + localizer.t("version.please_update"));
+      getLogger().warning("* " + localizer.t("version.download_link", versionData.getDownloadUrl()));
       getLogger().warning("****************************************************************************");
     }
   }

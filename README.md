@@ -4,6 +4,8 @@
 
 ELFIM (_pronounced "elf eye em"_) is a light-weight event logging plugin that posts selected events to Slack and Discord. It's a convenient way to keep track of who logged on when, or what commands they used while playing.
 
+__NOTE:__ Version 2.3.0 adds Internationalization support (with an included localized German properties file). I'd love for non-English speakers to contribute translations.
+
 #### Available at
 - [PaperMC](https://hangar.papermc.io/HideTheMonkey/EventLoggerForIM)
 - [SpigotMC](https://www.spigotmc.org/resources/eventloggerforim.118800/)
@@ -51,6 +53,19 @@ logServerProperties:
   - level-type
 ```
 
+Configure the language to use in the interface:
+```yaml
+# Specify the locale to use for messages (NOTE: must have a corresponding locale file in the plugin config folder)
+# example: ./plugins/EventLoggerForIM/i18n/en_US.properties or ./plugins/EventLoggerForIM/i18n/de.properties
+locale: en_US
+
+```
+To add a new translation, duplicate `en_US.properties` and save it with a new locale-specific filename using UTF-8 encoding (e.g., `ja_JP.properties`), and update the values accordingly. Then, set `locale: ja_JP` in config.yml to enable your new translations to appear in generated messages.
+
+If you would like your translation to be included in this project, please open an issue on GitHub and attach the translated file. I will review and integrate it as appropriate.
+
+__NOTE:__ The included `de.properties` file was generated using AI and may contain inaccuracies. Contributions from native German speakers to improve this translation are welcome and appreciated.
+
 ## Slack Configuration and Examples
 
 See the [Slack readme](./resources/Slack.md).
@@ -73,7 +88,6 @@ _The metrics can be disabled in config.yml if you really want, but please consid
 
 ## Potential Updates
 
-- Internationalize / Localize text strings
 - Add ability for players to send private messages to admins (From MC to Slack/Discord)
 - Address Discord's rate limiting issue with webhooks.
 
