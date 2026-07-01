@@ -27,6 +27,8 @@ import com.hidethemonkey.elfim.AdvancementConfig;
 import com.hidethemonkey.elfim.ELConfig;
 import com.hidethemonkey.elfim.messaging.PlayerHandlerInterface;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
@@ -138,9 +140,9 @@ public class PlayerListeners {
     /**
      * @param event
      */
-    @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) {
-      if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+      if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
         playerHandler.playerFailedLogin(event, config, plugin.getLogger());
       }
     }

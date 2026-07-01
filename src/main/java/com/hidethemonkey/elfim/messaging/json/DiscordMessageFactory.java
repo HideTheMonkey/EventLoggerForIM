@@ -63,23 +63,6 @@ public class DiscordMessageFactory {
   }
 
   /**
-   * @return
-   */
-  public DiscordMessage getMessage() {
-    return new DiscordMessage(this.botUserName, this.botAvatarUrl);
-  }
-
-  /**
-   * @param content
-   * @return
-   */
-  public DiscordMessage getMessage(String content) {
-    DiscordMessage message = new DiscordMessage(this.botUserName, this.botAvatarUrl);
-    message.setContent(content);
-    return message;
-  }
-
-  /**
    * @param embed
    * @return
    */

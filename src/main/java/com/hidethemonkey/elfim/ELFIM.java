@@ -67,8 +67,8 @@ public class ELFIM extends JavaPlugin {
   public void onEnable() {
     ELConfig.updateConfig(this);
     saveDefaultConfig();
-    saveResource("i18n/en_US.properties", true);
-    saveResource("i18n/de.properties", true);
+    saveResource("i18n/en_US.properties", false);
+    saveResource("i18n/de.properties", false);
 
     ELConfig elConfig = new ELConfig(this.getConfig(), getLogger());
 

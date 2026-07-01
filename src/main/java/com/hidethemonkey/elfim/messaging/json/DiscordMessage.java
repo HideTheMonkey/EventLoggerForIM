@@ -30,24 +30,11 @@ import java.util.List;
 public class DiscordMessage {
   private String username;
   private String avatar_url;
-  private String content;
   private List<Embed> embeds;
-
-  public DiscordMessage(String username) {
-    this.username = username;
-  }
 
   public DiscordMessage(String username, String avatarUrl) {
     this.username = username;
     this.avatar_url = avatarUrl;
-  }
-
-  public void setAvatarUrl(String url) {
-    this.avatar_url = url;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
   }
 
   public void addEmbed(Embed embed) {
