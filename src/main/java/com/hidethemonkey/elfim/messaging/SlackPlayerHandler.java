@@ -31,8 +31,8 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -46,7 +46,7 @@ import com.slack.api.model.block.LayoutBlock;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
 
@@ -68,9 +68,9 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
    * @param config
    */
   @Override
-  public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
-    String message = localizer.t(
-        "slack.player.attempted_login", event.getPlayer().getName(), ((TextComponent) event.kickMessage()).content());
+  public void playerFailedLogin(AsyncPlayerPreLoginEvent event, ELConfig config, Logger logger) {
+    String kickMsg = PlainTextComponentSerializer.plainText().serialize(event.kickMessage());
+    String message = localizer.t("slack.player.attempted_login", event.getName(), kickMsg);
     postMessage(message, config.getSlackChannelId(), config.getSlackAPIToken());
   }
 
@@ -87,7 +87,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
                 config.getMCUserBustUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("name"), player.getName())),
             BlockBuilder
-                .getMarkdown(String.format("*%s:* %s", localizer.t("address"), player.getAddress().getHostName())),
+                .getMarkdown(String.format("*%s:* %s", localizer.t("address"), player.getAddress() != null ? player.getAddress().getHostName() : "unknown")),
             BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("op"), player.isOp())),
             BlockBuilder.getMarkdown(
                 String.format("*%s:* %d", localizer.t("online_players"), player.getServer().getOnlinePlayers().size())),
@@ -182,7 +182,8 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
   public void playerDeath(PlayerDeathEvent event, ELConfig config) {
     List<LayoutBlock> blocks = BlockBuilder.getListBlocksWithHeader(localizer.t("slack.player.header.died"));
     Player player = event.getEntity();
-    String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
+    net.kyori.adventure.text.Component deathComponent = event.deathMessage();
+    String deathMessage = deathComponent != null ? PlainTextComponentSerializer.plainText().serialize(deathComponent) : null;
     blocks.add(
         BlockBuilder.getContextBlock(
             BlockBuilder.getImageElement(

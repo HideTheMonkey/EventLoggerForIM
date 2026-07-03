@@ -30,7 +30,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class VersionChecker {
 
@@ -45,10 +46,10 @@ public class VersionChecker {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response != null && response.statusCode() == 200) {
-                JSONObject obj = new JSONObject(response.body());
-                version = new VersionData(obj.getString("tag_name"),
-                        obj.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"),
-                        obj.getString("published_at"));
+                JsonObject obj = JsonParser.parseString(response.body()).getAsJsonObject();
+                version = new VersionData(obj.get("tag_name").getAsString(),
+                        obj.getAsJsonArray("assets").get(0).getAsJsonObject().get("browser_download_url").getAsString(),
+                        obj.get("published_at").getAsString());
             }
         } catch (IOException | InterruptedException e) {
             // do nothing

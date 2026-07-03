@@ -28,8 +28,8 @@ import com.hidethemonkey.elfim.ELConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public interface PlayerHandlerInterface {
   String getServiceName();
 
-  void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger);
+  void playerFailedLogin(AsyncPlayerPreLoginEvent event, ELConfig config, Logger logger);
 
   void playerJoin(Player player, ELConfig config);
 

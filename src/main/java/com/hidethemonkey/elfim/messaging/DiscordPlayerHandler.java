@@ -29,8 +29,8 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerRespawnEvent.RespawnReason;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -47,7 +47,7 @@ import com.hidethemonkey.elfim.messaging.json.Embed;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class DiscordPlayerHandler extends MessageHandler implements PlayerHandlerInterface {
 
@@ -72,11 +72,12 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
    * @param config
    */
   @Override
-  public void playerFailedLogin(PlayerLoginEvent event, ELConfig config, Logger logger) {
+  public void playerFailedLogin(AsyncPlayerPreLoginEvent event, ELConfig config, Logger logger) {
     Embed embed = new Embed(config.getDiscordColor("playerFailedLogin"));
     embed.setTitle(localizer.t("discord.player.attempted_login_title"));
-    embed.addAuthor(event.getPlayer().getName(), config.getMCUserAvatarUrl(event.getPlayer().getUniqueId().toString()));
-    embed.setDescription(((TextComponent) event.kickMessage()).content());
+    embed.addAuthor(event.getName(), config.getMCUserAvatarUrl(event.getUniqueId().toString()));
+    String kickMsg = PlainTextComponentSerializer.plainText().serialize(event.kickMessage());
+    embed.setDescription(kickMsg);
     DiscordMessage message = messageFactory.getMessage(embed);
 
     postWebhook(config.getDiscordWebhookUrl(), gson.toJson(message), logger);
@@ -94,7 +95,8 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     embed.addField(localizer.t("name"), player.getName());
     embed.addField(localizer.t("op"), Boolean.toString(player.isOp()));
     embed.addField(localizer.t("level"), Integer.toString(player.getLevel()));
-    embed.addField(localizer.t("address"), player.getAddress().getHostName());
+    java.net.InetSocketAddress addr = player.getAddress();
+    embed.addField(localizer.t("address"), addr != null ? addr.getHostName() : "unknown");
     embed.addField(localizer.t("exp"), Integer.toString(player.getTotalExperience()));
     embed.addField(localizer.t("xyz"), StringUtils.getLocationString(player.getLocation()));
     embed.addField(localizer.t("online_players"), Integer.toString(player.getServer().getOnlinePlayers().size()));
@@ -200,7 +202,8 @@ public class DiscordPlayerHandler extends MessageHandler implements PlayerHandle
     Embed embed = new Embed(config.getDiscordColor("playerDeath"));
     embed.setTitle(localizer.t("discord.player.died_title"));
     embed.addAuthor(player.getName(), config.getMCUserAvatarUrl(player.getUniqueId().toString()));
-    String deathMessage = (String) LegacyComponentSerializer.legacySection().serializeOrNull(event.deathMessage());
+    net.kyori.adventure.text.Component deathComponent = event.deathMessage();
+    String deathMessage = deathComponent != null ? PlainTextComponentSerializer.plainText().serialize(deathComponent) : null;
     embed.setDescription(deathMessage);
     DiscordMessage message = messageFactory.getMessage(embed);
 

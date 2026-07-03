@@ -76,18 +76,6 @@ public class BlockBuilder {
   }
 
   /**
-   * @param text
-   * @param image
-   * @return
-   */
-  public static SectionBlock getSection(String text, ImageElement image) {
-    return SectionBlock.builder()
-        .text(BlockCompositions.markdownText(text))
-        .accessory(image)
-        .build();
-  }
-
-  /**
    * @param image
    * @param text
    * @return

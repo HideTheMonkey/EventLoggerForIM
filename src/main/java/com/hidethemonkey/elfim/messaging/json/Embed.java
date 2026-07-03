@@ -32,18 +32,11 @@ public class Embed {
   private int color;
   private Author author;
   private String title;
-  private String url;
   private String description;
   private List<Field> fields;
-  private Image thumbnail;
   private Image image;
-  private Footer footer;
 
   public Embed(int color) {
-    this.color = color;
-  }
-
-  public void setColor(int color) {
     this.color = color;
   }
 
@@ -51,16 +44,8 @@ public class Embed {
     this.author = new Author(name, icon_url);
   }
 
-  public void addAuthor(String name, String icon_url, String url) {
-    this.author = new Author(name, icon_url, url);
-  }
-
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 
   public void setDescription(String description) {
@@ -74,16 +59,8 @@ public class Embed {
     this.fields.add(new Field(name, value));
   }
 
-  public void setThumbnail(String url) {
-    this.thumbnail = new Image(url);
-  }
-
   public void setImage(String url) {
     this.image = new Image(url);
-  }
-
-  public void setFooter(String text, String icon_url) {
-    this.footer = new Footer(text, icon_url);
   }
 
   /////////////////////////////////////////////////
@@ -92,17 +69,10 @@ public class Embed {
   public class Author {
     private String icon_url;
     private String name;
-    private String url;
 
     public Author(String name, String icon_url) {
       this.icon_url = icon_url;
       this.name = name;
-    }
-
-    public Author(String name, String icon_url, String url) {
-      this.icon_url = icon_url;
-      this.name = name;
-      this.url = url;
     }
   }
 
@@ -111,16 +81,6 @@ public class Embed {
 
     public Image(String url) {
       this.url = url;
-    }
-  }
-
-  public class Footer {
-    private String text;
-    private String icon_url;
-
-    public Footer(String text, String icon_url) {
-      this.text = text;
-      this.icon_url = icon_url;
     }
   }
 
