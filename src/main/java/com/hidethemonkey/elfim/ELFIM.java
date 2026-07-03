@@ -177,60 +177,17 @@ public class ELFIM extends JavaPlugin {
           return Boolean.toString(!gravatarEmail.equals(ELConfig.REPLACE_ME) && !gravatarEmail.isEmpty());
         }));
 
-        this.metrics.addCustomChart(new SimplePie("log_server_start_stop", () -> {
-          return Boolean.toString(config.getLogServerStartStop(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogServerStartStop(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_broadcasts", () -> {
-          return Boolean.toString(config.getLogBroadcasts(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogBroadcasts(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_server_command", () -> {
-          return Boolean.toString(config.getLogServerCommand(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogServerCommand(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_join_leave", () -> {
-          return Boolean.toString(config.getLogPlayerJoinLeave(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerJoinLeave(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_unsuccessful_login", () -> {
-          return Boolean.toString(config.getLogUnsuccessfulLogin(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogUnsuccessfulLogin(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_chat", () -> {
-          return Boolean.toString(config.getLogChat(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogChat(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_advancement", () -> {
-          return Boolean.toString(config.getLogPlayerAdvancement(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerAdvancement(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_commands", () -> {
-          return Boolean.toString(config.getLogPlayerCommands(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerCommands(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_death", () -> {
-          return Boolean.toString(config.getLogPlayerDeath(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerDeath(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_respawn", () -> {
-          return Boolean.toString(config.getLogPlayerRespawn(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerRespawn(ELConfig.DISCORD));
-        }));
-
-        this.metrics.addCustomChart(new SimplePie("log_player_teleport", () -> {
-          return Boolean.toString(config.getLogPlayerTeleport(ELConfig.SLACK)) + ":" + Boolean
-              .toString(config.getLogPlayerTeleport(ELConfig.DISCORD));
-        }));
+        pairChart("log_server_start_stop", config::getLogServerStartStop);
+        pairChart("log_broadcasts", config::getLogBroadcasts);
+        pairChart("log_server_command", config::getLogServerCommand);
+        pairChart("log_player_join_leave", config::getLogPlayerJoinLeave);
+        pairChart("log_unsuccessful_login", config::getLogUnsuccessfulLogin);
+        pairChart("log_chat", config::getLogChat);
+        pairChart("log_player_advancement", config::getLogPlayerAdvancement);
+        pairChart("log_player_commands", config::getLogPlayerCommands);
+        pairChart("log_player_death", config::getLogPlayerDeath);
+        pairChart("log_player_respawn", config::getLogPlayerRespawn);
+        pairChart("log_player_teleport", config::getLogPlayerTeleport);
 
         this.metrics.addCustomChart(new SimplePie("translation_locale", () -> {
           return localizer.getLocale();
@@ -240,6 +197,12 @@ public class ELFIM extends JavaPlugin {
         getLogger().info(localizer.t("metrics.info.not_enabled"));
       }
     }
+  }
+
+  // ponytail: collapses the identical SLACK:DISCORD boolean-pair telemetry charts
+  private void pairChart(String id, java.util.function.Predicate<String> getter) {
+    metrics.addCustomChart(new SimplePie(id,
+        () -> getter.test(ELConfig.SLACK) + ":" + getter.test(ELConfig.DISCORD)));
   }
 
   /**
