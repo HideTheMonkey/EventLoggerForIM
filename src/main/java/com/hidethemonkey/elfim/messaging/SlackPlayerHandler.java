@@ -87,7 +87,7 @@ public class SlackPlayerHandler extends MessageHandler implements PlayerHandlerI
                 config.getMCUserBustUrl(player.getUniqueId().toString()), player.getName()),
             BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("name"), player.getName())),
             BlockBuilder
-                .getMarkdown(String.format("*%s:* %s", localizer.t("address"), player.getAddress() != null ? player.getAddress().getHostName() : "unknown")),
+                .getMarkdown(String.format("*%s:* %s", localizer.t("address"), player.getAddress() != null ? player.getAddress().getHostString() : "unknown")),
             BlockBuilder.getMarkdown(String.format("*%s:* %s", localizer.t("op"), player.isOp())),
             BlockBuilder.getMarkdown(
                 String.format("*%s:* %d", localizer.t("online_players"), player.getServer().getOnlinePlayers().size())),
